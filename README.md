@@ -52,10 +52,14 @@ Or install it yourself as:
 ```
 Aliexpress.app_key = 'Your app key'
 Aliexpress.app_secret = 'Your app secret' 
+
+# redis 要不要引入 namespace？？？
 Aliexpress.redis = Redis.new 
 ```
 
-**TODO**: 配置获取 code 的授权还没有完成， 这个参考谁。
+**TODO**: 配置获取 code 的授权还没有完成， 这个参考 redis-bowser 中设置，将路由挂载到 rails 中。
+
+
 
 ## Development
 
@@ -71,6 +75,14 @@ Aliexpress.redis = Redis.new
 备注：
 
 方法的命名，取自 API 文档中的 apiName，将其中的 `api.` 前缀去掉。 
+
+
+### 关于各个接口数据结构的设置
+
+参考: https://ruby-china.org/topics/14459。 
+
+考虑使用 Struct 和 OpenStruct，想到最后上传和接口的使用。最后，使用了属性比较严格 Struct
+
 
 
 ## Contributing

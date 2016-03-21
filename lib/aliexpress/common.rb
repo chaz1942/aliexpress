@@ -36,7 +36,7 @@ module Aliexpress
 
       puts "response = #{response}"
 
-      JSON.parse(response.body)
+      Time.parse response.body
     end
   end
 end

@@ -1,5 +1,31 @@
 # -*- encoding : utf-8 -*-
 module Aliexpress
+
+  ### 数据常量的定义
+
+  # 备注：使用严格类型定义
+  # SKU 对象
+  ProductSKU = Struct.new(:aeopSKUProperty, :skuPrice, :skuCode, :skuStock, :ipmSkuStock, :id, :currencyCode) do
+
+  end
+
+  # SKU 属性对象
+  SKUProperty = Struct.new(:skuPropertyId, :propertyValueId, :propertyValueDefinitionName, :skuImage) do
+
+  end
+
+  # 商品类目属性对象
+  ProductProperty = Struct.new(:attrNameId, :attrName, :attrValueId, :attrValue) do
+
+  end
+
+  # 产品展示对象
+  ProductDisplayDTO = Struct.new(:subject, :groupId, :wsOfflineDate, :productId, :imageURLs, :src, :wsDisplay,
+                                 :gmtCreate, :productMinPrice, :productMaxPrice, :ownerMemberId, :ownerMemberSeq) do
+
+  end
+
+
   class Product < Base
 
     # 卖家可以通过这个接口发布一个多语言商品。一次只能发布一种多语言商品
@@ -220,6 +246,7 @@ module Aliexpress
     # 发布产品信息
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.postAeProduct&v=1
     #
+    # @param [Hash] 应用参数
     def self.postAeProduct(params = {})
       api_endpoint 'api.postAeProduct', params
     end

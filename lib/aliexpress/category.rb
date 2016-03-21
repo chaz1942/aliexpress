@@ -24,6 +24,12 @@ module Aliexpress
       api_endpoint 'api.getPostCategoryById', {cateId: id}
     end
 
+    # 获取叶子类目下的 普通类目属性
+    # @note #doc#
+    def self.getAttributesResultByCateId(id = 3)
+      api_endpoint 'api.getAttributesResultByCateId', {cateId: id}
+    end
+
     # 通过关键词获取发布类目
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.recommendCategoryByKeyword&v=1
     #
@@ -60,6 +66,7 @@ module Aliexpress
     def self.sizeModelsRequiredForPostCat(params = {})
       api_endpoint 'api.sizeModelsRequiredForPostCat', params
     end
+
 
   end
 
@@ -136,9 +143,10 @@ module Aliexpress
 
   #
   # 将存放到 redis 中的数据存到 csv 文件中
+  #
   def self.dump_category
     category_file = "tmp/aliexpress_category_#{Time.now.strftime('%Y%m%d%h%m')}.csv"
-    headers = %w(id 等级 名称-中文 名称-英文 parent_id)
+    headers = %w(id 等级 名称-中文 名称-英文 parent_id isleaf)
 
     CSV.open category_file, 'wb' do |csv|
       csv << headers
@@ -146,10 +154,62 @@ module Aliexpress
 
         Marshal.load(v).aeopPostCategoryList.each do |category|
           puts category
-          csv << [category['id'], category['level'], category['names']['zh'], category['names']['en'], k]
+          csv << [category['id'], category['level'], category['names']['zh'], category['names']['en'], k, category['isleaf']]
         end
       end
     end
-
   end
+
+  #
+  # 获取 商品三级分类 下的 sku 属性
+  #
+  def self.cache_product_sku
+    category_file = 'tmp/aliexpress_category_20160321Mar03.csv'
+
+    category_ids = []
+
+    CSV.foreach category_file do |row|
+      category_ids << row[0]
+    end
+
+    category_ids[1..-1].each do |id|
+      next if Aliexpress.redis.hexists 'product_skus', id
+
+      tmp_sku = Aliexpress::Category.getAttributesResultByCateId(id)
+
+      Aliexpress.redis.hset 'product_skus', id, Marshal.dump(tmp_sku)
+    end
+  end
+
+  #
+  # 将 三级分类属性 导出到 csv 格式的文件中
+  #
+  def self.dump_product_sku
+    sku_file = "tmp/product_sku_#{Time.now.strftime('%Y%m%d%h%m')}.csv"
+
+    headers = %w(sku_id 中文名 英文名 子属性id 子属性中文名 子属性英文名 是否为必须)
+
+    CSV.open sku_file, 'wb' do |csv|
+      csv << headers
+
+      Aliexpress.redis.hgetall('product_skus').each do |k, v|
+        tmp_skus = Marshal.load(v)
+        next if tmp_skus.attributes.blank?
+
+        tmp_skus.attributes.each do |sku|
+          puts "sku = #{sku}"
+          puts "insert array = #{ [sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required] }"
+          # Note: 注意不能使用 sku.values
+          if sku[:values].present?
+            sku[:values].each do |item|
+              csv << [sku.id, sku.names.zh, sku.names.en, item.id, item.names.zh, item.names.en, sku.required]
+            end
+          else
+            csv << [sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required]
+          end
+        end
+      end
+    end
+  end
+
 end
