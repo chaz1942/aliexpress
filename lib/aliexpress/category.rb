@@ -2,7 +2,7 @@
 require 'csv'
 module Aliexpress
   class Category < Base
-    # TODO: 数据结构之类的如何存储
+    # TODO: 数据结构之类的如何存储, 使用 Struct 结构体存储
 
     # 获取下级目录的类目信息
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.getChildrenPostCategoryById&v=1
@@ -161,6 +161,53 @@ module Aliexpress
   end
 
   #
+  # 将叶子节点三级分类的数据的数组获到
+  #
+  def get_leaf_category
+    category_ids = []
+    Aliexpress.redis.hgetall('categories').each do |k, v|
+
+      Marshal.load(v).aeopPostCategoryList.each do |category|
+        category_ids << category.id if category.isleaf
+      end
+    end
+
+    category_ids
+  end
+
+  #
+  #
+  #
+  def get_leaf_category_sku
+    sku_file = "tmp/leaf_category_sku_#{Time.now.strftime('%Y%m%d%h%m')}.csv"
+
+    headers = %w( 分类ID sku_id 中文名 英文名 子属性id 子属性中文名 子属性英文名 是否为必须)
+    CSV.open sku_file, 'wb' do |csv|
+      csv << headers
+
+      get_leaf_category.each do |k|
+        tmp_skus = Marshal.load(Aliexpress.redis.hget('product_skus', k))
+
+        next if tmp_skus.attributes.blank?
+
+        tmp_skus.attributes.each do |sku|
+          puts "sku = #{sku}"
+          puts "insert array = #{ [k, sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required] }"
+          # Note: 注意不能使用 sku.values
+          if sku[:values].present?
+            sku[:values].each do |item|
+              csv << [k, sku.id, sku.names.zh, sku.names.en, item.id, item.names.zh, item.names.en, sku.required]
+            end
+          else
+            csv << [k, sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required]
+          end
+        end
+
+      end
+    end
+  end
+
+  #
   # 获取 商品三级分类 下的 sku 属性
   #
   def self.cache_product_sku
@@ -187,7 +234,7 @@ module Aliexpress
   def self.dump_product_sku
     sku_file = "tmp/product_sku_#{Time.now.strftime('%Y%m%d%h%m')}.csv"
 
-    headers = %w(sku_id 中文名 英文名 子属性id 子属性中文名 子属性英文名 是否为必须)
+    headers = %w( 分类ID sku_id 中文名 英文名 子属性id 子属性中文名 子属性英文名 是否为必须)
 
     CSV.open sku_file, 'wb' do |csv|
       csv << headers
@@ -198,18 +245,17 @@ module Aliexpress
 
         tmp_skus.attributes.each do |sku|
           puts "sku = #{sku}"
-          puts "insert array = #{ [sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required] }"
+          puts "insert array = #{ [k, sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required] }"
           # Note: 注意不能使用 sku.values
           if sku[:values].present?
             sku[:values].each do |item|
-              csv << [sku.id, sku.names.zh, sku.names.en, item.id, item.names.zh, item.names.en, sku.required]
+              csv << [k, sku.id, sku.names.zh, sku.names.en, item.id, item.names.zh, item.names.en, sku.required]
             end
           else
-            csv << [sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required]
+            csv << [k, sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required]
           end
         end
       end
     end
   end
-
 end

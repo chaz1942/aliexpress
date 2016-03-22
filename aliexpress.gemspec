@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   # 暴露出一个 web 界面出来， 参考
   spec.add_dependency 'sinatra'
   spec.add_dependency 'sinatra-contrib'
-  # spec.add_dependency 'slim'
+  spec.add_dependency 'slim'
   # spec.add_dependency 'sass'
   # spec.add_dependency 'coffee-script'
 

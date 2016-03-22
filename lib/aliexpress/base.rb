@@ -1,9 +1,7 @@
 # -*- encoding : utf-8 -*-
-require 'nestful'
 require 'openssl' # 生成特定的验证码
 require 'redis'
 require 'json'
-require 'hashie'
 module Aliexpress
   class Base
 

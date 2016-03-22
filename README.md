@@ -59,7 +59,14 @@ Aliexpress.redis = Redis.new
 
 **TODO**: 配置获取 code 的授权还没有完成， 这个参考 redis-bowser 中设置，将路由挂载到 rails 中。
 
+找了一些资料，看到有这样的集中挂载路由的方法: 
 
+* 如 rucaptcha 中，直接将 rails 引入依赖的。
+* 引入 sinatra， 参考 RedisBrowser
+
+就一个路由，还是不带页面的，只要获取返回的参数就行了。想想改怎么整！！！
+
+使用 sinatra，感觉还挺简单的。
 
 ## Development
 
@@ -74,7 +81,7 @@ Aliexpress.redis = Redis.new
 
 备注：
 
-方法的命名，取自 API 文档中的 apiName，将其中的 `api.` 前缀去掉。 
+方法的命名，取自 API 文档中的 apiName，将其中的 `api.` 前缀去掉。（骆驼命名法，一种浓浓的 java 风） 
 
 
 ### 关于各个接口数据结构的设置
@@ -84,10 +91,11 @@ Aliexpress.redis = Redis.new
 考虑使用 Struct 和 OpenStruct，想到最后上传和接口的使用。最后，使用了属性比较严格 Struct
 
 
-
 ## Contributing
 
 实现上， 获取 access_token 的方式，参考了 https://github.com/lanrion/weixin_authorize。 
+
+**注意**： 自己实现其实是平台式的，也就是 每个用户授权的 access_token 可能不一样。这会改变目前存取 access_token 的方式，从数据库中存取。
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/xiajian/aliexpress. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
@@ -95,4 +103,3 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/xiajia
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-

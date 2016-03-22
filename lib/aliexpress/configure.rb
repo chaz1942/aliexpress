@@ -21,9 +21,13 @@ module Aliexpress
     mattr_accessor :auth_url
     self.auth_url = 'http://authhz.alibaba.com/auth/authorize.htm'
 
+    # 授权获取 url
+    mattr_accessor :token_url
+    self.token_url = 'https://gw.api.alibaba.com/openapi/param2/1/system.oauth2/getToken'
+
     # 回调地址
     mattr_accessor :redirect_uri
-    self.redirect_uri = ''
+    self.redirect_uri = 'http://xiajian.ngrok.natapp.cn/aliexpress/auth'
 
     mattr_accessor :redis
     self.redis = Redis.new password: 'Fy958e5mmyb7Ta4H'

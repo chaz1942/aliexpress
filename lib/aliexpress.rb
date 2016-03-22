@@ -1,5 +1,11 @@
 # -*- encoding : utf-8 -*-
+require 'sinatra/base'
+require 'multi_json'
+require 'sinatra/json'
+require 'nestful'
+require 'hashie'
 require 'aliexpress/version'
+require 'aliexpress/web'
 require 'active_support/core_ext/module/attribute_accessors'
 require 'active_support/core_ext/hash/conversions'
 

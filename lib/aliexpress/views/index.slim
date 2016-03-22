@@ -1,0 +1,14 @@
+doctype html
+html
+  head
+    title 阿里速卖通授权页面
+  body
+    h3 等待下次 refresh token 过期，再用这个页面。获取并刷新 token
+
+    p
+      | 记住，设置的地址是 /aliexpress/auth
+
+    code data-lang="ruby" class="language-ruby"
+      span require 'aliexpress/web'
+      br
+      span mount Aliexpress::Web => '/aliexpress/auth'
