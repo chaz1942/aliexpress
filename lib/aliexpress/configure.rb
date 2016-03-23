@@ -29,6 +29,7 @@ module Aliexpress
     mattr_accessor :redirect_uri
     self.redirect_uri = 'http://xiajian.ngrok.natapp.cn/aliexpress/auth'
 
+    # redis 链接配置
     mattr_accessor :redis
     self.redis = Redis.new password: 'Fy958e5mmyb7Ta4H'
 

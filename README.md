@@ -68,7 +68,7 @@ Aliexpress.redis = Redis.new
 
 使用 sinatra，感觉还挺简单的。
 
-## Development
+## 开发
 
 签出代码库之后， 运行 `bin/setup`安装依赖， 运行 `bin/console` 进入交互式探索环境。 
 
@@ -81,24 +81,21 @@ Aliexpress.redis = Redis.new
 
 备注：
 
-方法的命名，取自 API 文档中的 apiName，将其中的 `api.` 前缀去掉。（骆驼命名法，一种浓浓的 java 风） 
-
+方法的命名： 取自 API 文档中的 apiName，将其中的 `api.` 前缀去掉。（骆驼命名法，一种浓浓的 java 风） 
 
 ### 关于各个接口数据结构的设置
 
 参考: https://ruby-china.org/topics/14459。 
 
-考虑使用 Struct 和 OpenStruct，想到最后上传和接口的使用。最后，使用了属性比较严格 Struct
-
-
-## Contributing
+考虑使用 Struct 和 OpenStruct，想到最后上传和接口的使用。最后，使用了属性比较严格 Struct。
 
 实现上， 获取 access_token 的方式，参考了 https://github.com/lanrion/weixin_authorize。 
 
-**注意**： 自己实现其实是平台式的，也就是 每个用户授权的 access_token 可能不一样。这会改变目前存取 access_token 的方式，从数据库中存取。
+**注意**：自己实现其实是平台式的，也就是 每个用户授权的 access_token 可能不一样。这会改变目前存取 access_token 的方式，从数据库中存取。
+
+## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/xiajian/aliexpress. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
 
 ## License
 
