@@ -3,10 +3,23 @@ module Aliexpress
   class Authorization < Base
 
     #
-    # 获取授权的地址
-    # 参考: Sidekiq 的实现，其 web 授权。
-    def self.get_auth
-      "#{auth_url}?client_id=#{Aliexpress.app_key}&site=aliexpress&redirect_uri="
+    # 获取速卖通的授权登陆的地址
+    # 地址: http://gw.api.alibaba.com/dev/doc/intl/sys_auth.htm?ns=aliexpress.open
+    #
+    # @return String 返回发起授权的请求
+    def self.get_auth_url(params = '')
+      options = {
+          client_id: app_key,
+          site: 'aliexpress',
+          redirect_uri: redirect_uri,
+          state: params
+      }
+
+      signature = get_signature options.map { |k,v|  "#{k}#{v}" }.sort.join
+
+      puts "signature =  #{signature}"
+
+      "#{auth_url}?#{options.map { |k, v| "#{k}=#{v}" }.join('&')}&_aop_signature=#{signature}"
     end
 
     # 获取访问令牌的 token
