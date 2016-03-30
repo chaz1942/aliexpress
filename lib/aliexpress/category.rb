@@ -67,7 +67,6 @@ module Aliexpress
       api_endpoint 'api.sizeModelsRequiredForPostCat', params
     end
 
-
   end
 
   # 生成并保存 目录的 csv 文件

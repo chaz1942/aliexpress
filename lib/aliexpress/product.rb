@@ -25,7 +25,6 @@ module Aliexpress
 
   end
 
-
   class Product < Base
 
     # 卖家可以通过这个接口发布一个多语言商品。一次只能发布一种多语言商品

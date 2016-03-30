@@ -34,7 +34,6 @@ module Aliexpress
     self.redis = Redis.new password: 'Fy958e5mmyb7Ta4H'
 
     mattr_accessor :access_token
-    # self.access_token = '0549f04a-99f0-4434-9da5-48051c8594ab'
 
     mattr_accessor :refresh_token
     self.refresh_token = 'b6674082-c5e3-4fd7-b2d0-c2a440e45a0e'
