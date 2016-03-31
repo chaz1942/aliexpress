@@ -5,24 +5,54 @@ module Aliexpress
 
   # 备注：使用严格类型定义
   # SKU 对象
+  # aeopSKUProperty: SKU 属性对象列表
   ProductSKU = Struct.new(:aeopSKUProperty, :skuPrice, :skuCode, :skuStock, :ipmSkuStock, :id, :currencyCode) do
-
+    def self.default
+      new([], '200.07', 'cfas00973', true, 1234, '200000182:193;200007763:201336100', CurrencyCode::USD)
+    end
   end
 
   # SKU 属性对象
+  # 属性介绍
   SKUProperty = Struct.new(:skuPropertyId, :propertyValueId, :propertyValueDefinitionName, :skuImage) do
-
+    def self.default
+      new(14, 771, 'back', 'http://xiajian.github.io/assets/images/face.jpg')
+    end
   end
 
   # 商品类目属性对象
   ProductProperty = Struct.new(:attrNameId, :attrName, :attrValueId, :attrValue) do
-
+    def self.defualt
+      new(200000043, 'size', 581, '2 - 5 kg')
+    end
   end
 
   # 产品展示对象
   ProductDisplayDTO = Struct.new(:subject, :groupId, :wsOfflineDate, :productId, :imageURLs, :src, :wsDisplay,
                                  :gmtCreate, :productMinPrice, :productMaxPrice, :ownerMemberId, :ownerMemberSeq) do
+    def self.default
 
+    end
+
+  end
+
+  # 商品的基本信息 - 参数
+  ProductDisplaySampleDTO = Struct.new(:subject, :groupId, :wsOfflineDate, :productId, :imageURLs, :src, :gmtCreate, :gmtModified) do
+
+  end
+
+  # 产品子分组
+  ChildProductGroup = Struct.new(:groupId, :groupName) do
+    def self.default
+      new(500052004, 'twrewerw')
+    end
+  end
+
+  # 产品分组信息
+  ProductGroup = Struct.new(:groupID, :groupName, :childGroup) do
+    def self.default
+      new(262007001, 'testjiweji', [])
+    end
   end
 
   class Product < Base
