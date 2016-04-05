@@ -1,9 +1,15 @@
 module Aliexpress
   class Image < Base
+    module LocationType
+      ALL_GROUP = 'ALL_GROUP'
+
+      SUB_GROUP = 'SUB_GROUP'
+
+      UNGROUP = 'UNGROUP'
+    end
 
     # 上传图片到临时目录(推荐使用)
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.uploadTempImage4SDK&v=1
-    #
     #
     def self.uploadTempImage4SDK(params = {})
       api_endpoint 'api.uploadTempImage4SDK', params
@@ -62,6 +68,7 @@ module Aliexpress
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.listImagePagination&v=1
     #
     def self.listImagePagination(params = {})
+      params.merge!(currentPage: 1, pageSize: 6, locationType: LocationType::ALL_GROUP)
       api_endpoint 'api.listImagePagination', params
     end
   end

@@ -15,9 +15,10 @@ module Aliexpress
     #
     # @param [string] api_name - 速卖通 API 的名字
     # @param [Hash] params - api 的应用级参数
+    # @param [Hash] body - api 请求body
     #
-    def self.api_endpoint(api_name, params)
-      _api_endpoint(api_name: api_name, params: params)
+    def self.api_endpoint(api_name, params = {}, body = {})
+      _api_endpoint(api_name: api_name, params: params, body: body)
     end
 
     protected
@@ -149,11 +150,16 @@ module Aliexpress
     #
     # @example http://gw.api.alibaba.com/dev/tools/api_test_intl.html
     #
+    # @param api_version - API 版本
+    # @param api_namespace - API 命名空间
+    #
+    #
     # @note urlPath 的规则: 将除了 _aop_signature 以外的其他所有参数都加入 signature 的生成
     #       大多数的接口是不需要 _aop_timestamp(以毫秒表示)
+    #       特定的请求，需要设定请求提供
     #
     # @return [Hash] 请求返回的相应
-    def self._api_endpoint(api_version: 1, api_namespace: 'aliexpress.open', api_name: 'dev.test', params: {}, protocol: 'param2')
+    def self._api_endpoint(api_version: 1, api_namespace: 'aliexpress.open', api_name: 'dev.test', params: {}, protocol: 'param2', body: {})
       url_path = "#{protocol}/#{api_version}/#{api_namespace}/#{api_name}/#{app_key}"
 
       params.merge!({access_token: access_token
@@ -164,21 +170,33 @@ module Aliexpress
 
       signature_factor << params.map { |k, v| "#{k}#{v}" }.sort.join
 
-      puts "signature_factor = #{signature_factor}"
+      # puts "signature_factor = #{signature_factor}"
 
       signature = get_signature signature_factor
 
-      puts "signature = #{signature}"
+      # puts "signature = #{signature}"
 
       params.merge! _aop_signature: signature
 
       tmp_url = "#{api_url}/#{url_path}?#{params.map { |k, v| "#{k}=#{v}" }.join('&')}"
 
-      puts tmp_url
+      puts "Request URL：#{tmp_url}"
 
-      response = Nestful.post tmp_url
+      request = Nestful::Request.new tmp_url, method: :post, format: :json
 
-      puts "response = #{response}"
+      request.body = body.map { |k, v| "#{k}=#{v}" }.join('&') if body.present?
+
+      puts "Request Body: #{request.body}"
+
+      start_time = Time.now
+
+      response = request.execute
+
+      cost_time = Time.now - start_time
+
+      puts "Time Cost: #{cost_time} s"
+
+      puts "Response Result: #{response}"
 
       # TODO: 根据获取的返回值，抛出异常，刷新访问 token
       ::Hashie::Mash.new JSON.parse(response.body)

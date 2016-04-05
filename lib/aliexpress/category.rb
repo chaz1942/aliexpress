@@ -1,8 +1,24 @@
 # -*- encoding : utf-8 -*-
 require 'csv'
 module Aliexpress
+
+  # 类目描述信息
+  PostCategory = Struct.new(:id, :names, :isleaf) do
+
+  end
+
+  # 发布属性单位
+  AeopUnit = Struct.new(:rate, :unitName) do
+
+  end
+
   class Category < Base
     # TODO: 数据结构之类的如何存储, 使用 Struct 结构体存储
+    CATEGORY_SKU = 'category_sku'.freeze
+
+    def self.get_category_property_by_cache
+      
+    end
 
     # 获取下级目录的类目信息
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.getChildrenPostCategoryById&v=1
@@ -30,7 +46,7 @@ module Aliexpress
       api_endpoint 'api.getAttributesResultByCateId', {cateId: id}
     end
 
-    # 通过关键词获取发布类目
+    # 通过关键词获取发布类目 - 搜索获取
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.recommendCategoryByKeyword&v=1
     #
     # @param [Hash] params 应用级参数 - { keyword: 'mp4' }
@@ -66,7 +82,6 @@ module Aliexpress
     def self.sizeModelsRequiredForPostCat(params = {})
       api_endpoint 'api.sizeModelsRequiredForPostCat', params
     end
-
   end
 
   # 生成并保存 目录的 csv 文件

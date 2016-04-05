@@ -72,6 +72,7 @@ module Aliexpress
     #
     # @note: 目前只查询进入放款中的订单信息状态，未进入放款中订单暂未做内容兼容。
     def self.findLoanListQuery(params = {})
+      params.merge!({page: 1, pageSize: 50})
       api_endpoint 'api.findLoanListQuery', params
     end
 

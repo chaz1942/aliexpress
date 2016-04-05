@@ -6,24 +6,61 @@ module Aliexpress
   # 备注：使用严格类型定义
   # SKU 对象
   # aeopSKUProperty: SKU 属性对象列表
+  # aeopSKUProperty - SKU属性集， skuPrice - SKU 的价格， ipmSkuStock - 可售库存 必填
+  # skuStock - 判断是否有货
   ProductSKU = Struct.new(:aeopSKUProperty, :skuPrice, :skuCode, :skuStock, :ipmSkuStock, :id, :currencyCode) do
-    def self.default
-      new([], '200.07', 'cfas00973', true, 1234, '200000182:193;200007763:201336100', CurrencyCode::USD)
+    def self.default(skus = [])
+      sku_properties = []
+
+      skus.each do |sku|
+        sku_properties << SKUProperty.default(sku)
+      end
+
+      new(sku_properties, '200.07', '', true, 1, '', CurrencyCode::USD)
     end
   end
 
   # SKU 属性对象
   # 属性介绍
+  # propertyValueDefinitionName - 自定义名称
+  # skuImage - 自定义图片
   SKUProperty = Struct.new(:skuPropertyId, :propertyValueId, :propertyValueDefinitionName, :skuImage) do
-    def self.default
-      new(14, 771, 'back', 'http://xiajian.github.io/assets/images/face.jpg')
+    def self.default(sku = {})
+      if sku.present?
+        value_id = sku[:values][rand(sku[:values].length)].id
+        case sku.attributeShowTypeValue
+          when 'input'
+            {skuPropertyId: sku.id, propertyValueId: ''}
+          when 'list_box'
+            {skuPropertyId: sku.id, propertyValueId: value_id}
+          when 'check_box'
+            {skuPropertyId: sku.id, propertyValueId: value_id}
+          when 'other'
+            {skuPropertyId: sku.id, propertyValueId: 4, attrValue: ''}
+        end
+      else
+        new(14, 771, 'back', 'http://xiajian.github.io/assets/images/face.jpg')
+      end
     end
   end
 
-  # 商品类目属性对象
+  # 商品类目属性对象, 看起来没什么用
+  # 根据 类目属性的类型不同，所取的值会有所不同
   ProductProperty = Struct.new(:attrNameId, :attrName, :attrValueId, :attrValue) do
-    def self.defualt
-      new(200000043, 'size', 581, '2 - 5 kg')
+    def self.default(property = {})
+      if property.present?
+        case property.attributeShowTypeValue
+          when 'input'
+            {attrNameId: property.id, attrValue: ''}
+          when 'list_box' || 'check_box'
+            value_id = property[:values][rand(property[:values].length)].id
+            {attrNameId: property.id, attrValueId: value_id}
+          when 'other'
+            {attrNameId: property.id, attrValueId: 4, attrValue: ''}
+        end
+      else
+        new(200000043, 'size', 581, '2 - 5 kg')
+      end
     end
   end
 
@@ -56,6 +93,45 @@ module Aliexpress
   end
 
   class Product < Base
+
+    # 产品计量单位
+    module Unit
+      BAG = 100000000 # 袋
+      BARREL = 100000001 # 桶
+      BUSHEL = 100000002 # 蒲式耳
+      CARTON = 100078580 # 箱
+      CENTIMETER = 100078581 # 厘米
+      CUBIC_METER = 100000003 # 立方米
+      DOZEN = 100000004 # 打
+      FEET = 100078584 # 英尺
+      GALLON = 100000005 # 加仑
+      GRAM = 100000006 # 克
+      INCH = 100078587 # 英寸
+      KILOGRAM = 100000007 # 千克
+      KILOLITER = 100078589 # 千升
+      KILOMETER = 100000008 # 千米
+      LITER = 100078559 # 升
+      LONG_TON = 100000009 # 英吨
+      METER = 100000010 # 米
+      METRIC_TON = 100000011 # 公吨
+      MILLIGRAM = 100078560 # 毫克
+      MILLILITER = 100078596 # 毫升
+      MILLIMETER = 100078597 # 毫米
+      OUNCE = 100000012 # 盎司
+      PACK = 100000014 # 包
+      PAIR = 100000013 # 双
+      PIECE = 100000015 # 件/个
+      POUND = 100000016 # 磅
+      QUART = 100078603 # 夸脱
+      SET = 100000017 # 套
+      SHORT_TON = 100000018 # 美吨
+      SQUARE_FEET = 100078606 # 平方英尺
+      SQUARE_INCH = 100078607 # 平方英寸
+      SQUARE_METER = 100000019 # 平方米
+      SQUARE_YARD = 100078609 # 平方码
+      TON = 100000020 # 吨
+      YARD = 100078558 # 码
+    end
 
     # 卖家可以通过这个接口发布一个多语言商品。一次只能发布一种多语言商品
     # 地址: http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=alibaba.product.postMultilanguageAeProduct&v=1
@@ -129,7 +205,7 @@ module Aliexpress
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.getSizeChartInfoByCategoryId&v=1
     #
     def self.getSizeChartInfoByCategoryId(id = 0)
-      api_endpoint 'api.getSizeChartInfoByCategoryId', { categoryId: id }
+      api_endpoint 'api.getSizeChartInfoByCategoryId', {categoryId: id}
     end
 
     # 修改商品所引用的尺码模板
@@ -276,8 +352,8 @@ module Aliexpress
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.postAeProduct&v=1
     #
     # @param [Hash] 应用参数
-    def self.postAeProduct(params = {})
-      api_endpoint 'api.postAeProduct', params
+    def self.postAeProduct(params = {}, body = {})
+      api_endpoint 'api.postAeProduct', params, body
     end
   end
 end

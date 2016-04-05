@@ -6,7 +6,7 @@ module Aliexpress
       "aliexpress_#{key.map { |x| x.respond_to?(:to_a) ? x.to_a : x}.flatten.join('_')}"
     end
 
-    # 获取对应 key 的值
+    # 获取对应 key 的值 - 想办法从写这个函数
     def self.fetch(key, time = 12.hour)
       puts "###### cache-key #######  #{key} #######"
 
