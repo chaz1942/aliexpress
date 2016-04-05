@@ -7,7 +7,7 @@ module Aliexpress
     get '/' do
       puts "params = #{params}"
 
-      get_access_token_by_code params[:code]
+      Aliexpress::Authorization.get_access_token_by_code params[:code]
 
       slim :index
     end

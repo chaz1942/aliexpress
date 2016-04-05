@@ -29,6 +29,10 @@ module Aliexpress
     mattr_accessor :redirect_uri
     self.redirect_uri = 'http://xiajian.ngrok.natapp.cn/aliexpress/auth'
 
+    # 项目主地址 - 授权回调之后跳转的地址
+    mattr_accessor :project_url
+    self.project_url = '/'
+
     # redis 链接配置
     mattr_accessor :redis
     self.redis = Redis.new password: 'Fy958e5mmyb7Ta4H'
@@ -36,6 +40,5 @@ module Aliexpress
     mattr_accessor :access_token
 
     mattr_accessor :refresh_token
-    self.refresh_token = 'b6674082-c5e3-4fd7-b2d0-c2a440e45a0e'
   end
 end

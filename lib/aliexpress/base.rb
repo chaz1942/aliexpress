@@ -33,6 +33,22 @@ module Aliexpress
       refresh_access_token
     end
 
+    # 通过 redis 获取 refresh_token, 并设置过期时间
+    #
+    # @return 返回 refresh_token
+    def self.refresh_token
+      token = redis.get REFRESH_TOKEN_KEY
+
+      if token.present?
+        token
+      else
+        raise ValidRefreshTokenException, 'Refresh token cannot be empty !'
+      end
+    rescue => e
+      puts e
+      puts 'should redirect to Authorization.get_auth_url'
+    end
+
     #
     # 设置访问 token
     #

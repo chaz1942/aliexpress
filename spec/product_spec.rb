@@ -47,7 +47,7 @@ describe Aliexpress::Product do
           aeopAeProductPropertys: get_product_properties,   # 产品属性
           deliveryTime: 20,
           detail: '<p>这是一个大的测试</p>',
-          freightTemplateId: ,                     # 运费模板
+          freightTemplateId: '',                     # 运费模板
           # 可选字段 - optional fields
           productPrice: 123.00,
           productUnit: '',
@@ -61,6 +61,8 @@ describe Aliexpress::Product do
           bulkOrder: '',
           bulkDiscount: ''
       }
+
+
     end
   end
 

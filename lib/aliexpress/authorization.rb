@@ -47,10 +47,12 @@ module Aliexpress
           code: code
       }
 
-      token_url =  "#{token_url}/#{app_key}?#{options.map { |k, v| "#{k}=#{v}" }.join('&')}"
+      tmp_url =  "#{token_url}/#{app_key}?#{options.map { |k, v| "#{k}=#{v}" }.join('&')}"
+
+      puts "token_url = #{tmp_url}"
 
       # RestClient 发送 post 请求，报 RestClient::BadRequest: 400 Bad Request
-      response = JSON.parse Nestful.post(token_url)
+      response = JSON.parse Nestful.post(tmp_url)
 
       puts "response = #{response}"
 

@@ -1,5 +1,13 @@
 # -*- encoding : utf-8 -*-
 module Aliexpress
+  OrderList = Struct.new(:totalItem, :orderList) do
+
+  end
+
+  OrderItem = Struct.new(:bizType, :buyerLoginId) do
+
+  end
+
   class Order < Base
 
     # 一键延长买家收货时间
