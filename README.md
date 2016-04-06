@@ -68,6 +68,8 @@ Aliexpress.redis = Redis.new
 
 使用 sinatra，感觉还挺简单的。
 
+遇到一个问题： 授权结束后，跳转地址如何处理，跳转后的 flash 如何处理，这样才能，处理成功或者异常的有效性并没有做处理。
+
 ## 开发
 
 签出代码库之后， 运行 `bin/setup`安装依赖， 运行 `bin/console` 进入交互式探索环境。 
@@ -93,7 +95,13 @@ Aliexpress.redis = Redis.new
 
 **注意**：自己实现其实是平台式的，也就是 每个用户授权的 access_token 可能不一样。这会改变目前存取 access_token 的方式，从数据库中存取。
 
-开始
+### Rspec 测试
+
+第一次写测试，好兴奋。
+
+Rspec 的执行： `spec spec/**.rb`，相当厉害，比我之前总是 repl 环境中执行效率高多了，以后，都用这种方法。
+
+还看到 用 minitest 作为 测试库的，有机会的话下次测试用这个方式
 
 ## Contributing
 

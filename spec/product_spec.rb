@@ -27,27 +27,19 @@ describe Aliexpress::Product do
     # 获取图片的 URL - 图片链接
     def get_image_urls
       image_key = Aliexpress::Cache.generate_key('image_urls_key')
-      image_urls = Aliexpress.redis.get image_key
-
-      if image_urls.present?
-        image_urls = Marshal.load image_urls
-      else
-        image_urls = Aliexpress::Image.listImagePagination
-        Aliexpress.redis.set image_key, Marshal.dump(image_urls)
+      image_urls = Aliexpress::Cache.fetch image_key do
+        Aliexpress::Image.listImagePagination
       end
 
       image_urls.images.map(&:url)[0..5].join(';')
     end
 
+    # 获取运费模板的 ID
     def get_freight_template_id
       freight_key = Aliexpress::Cache.generate_key('freight_key')
-      freights = Aliexpress.redis.get freight_key
 
-      if freights.present?
-        freights = Marshal.load freights
-      else
-        freights = Aliexpress::Freight.listFreightTemplate
-        Aliexpress.redis.set freight_key, freights
+      freights = Aliexpress::Cache.fetch freight_key do
+        Aliexpress::Freight.listFreightTemplate
       end
 
       freights.aeopFreightTemplateDTOList.sample.templateId
@@ -62,20 +54,15 @@ describe Aliexpress::Product do
           couponEndDate: Date.new
       }
 
-      # 对比两个接口的区别
-      # skus = Aliexpress::Category.getAttributesResultByCateId 200002024
-
       # 所有的 SKU 信息
-      all_sku = if Aliexpress.redis.get('test_sku') != nil
-                  Marshal.load Aliexpress.redis.get('test_sku')
-                else
-                  Aliexpress::Category.getChildAttributesResultByPostCateIdAndPath cateId: category_id
-                end
+      all_sku = Aliexpress::Cache.fetch 'test_sku' do
+        Aliexpress::Category.getChildAttributesResultByPostCateIdAndPath cateId: category_id
+      end
 
       # 所有 sku 属性 为 false 的，都是 类目属性
       product_property = all_sku.attributes.reject { |item| item.sku }
 
-      # 获取类目属性
+      # 获取类目属性，并按顺序排序
       product_skus = all_sku.attributes.reject { |item| item.sku == false }.sort_by(&:spec)
 
       options = {
