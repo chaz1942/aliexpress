@@ -178,15 +178,17 @@ module Aliexpress
 
       params.merge! _aop_signature: signature
 
-      tmp_url = "#{api_url}/#{url_path}?#{params.map { |k, v| "#{k}=#{v}" }.join('&')}"
+      tmp_url = "#{api_url}/#{url_path}?#{Nestful::Helpers.to_url_param params}"
 
       puts "Request URL：#{tmp_url}"
 
       request = Nestful::Request.new tmp_url, method: :post, format: :json
 
-      request.body = body.map { |k, v| "#{k}=#{v}" }.join('&') if body.present?
+      if body.present?
+        request.body = Nestful::Helpers.to_url_param body
 
-      puts "Request Body: #{request.body}"
+        puts "Request Body: #{request.body}"
+      end
 
       start_time = Time.now
 

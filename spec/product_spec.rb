@@ -10,7 +10,7 @@ describe Aliexpress::Product do
 
       product_skus << Aliexpress::ProductSKU.default(skus).to_h
 
-      product_skus
+      product_skus.to_json
     end
 
     # 获取商品属性
@@ -21,7 +21,7 @@ describe Aliexpress::Product do
         product_properties << Aliexpress::ProductProperty.default(property)
       end
 
-      product_properties
+      product_properties.to_json
     end
 
     # 获取图片的 URL - 图片链接
@@ -45,6 +45,17 @@ describe Aliexpress::Product do
       freights.aeopFreightTemplateDTOList.sample.templateId
     end
 
+    # 获取服务模板
+    def get_promise_template_id
+      promise_key = Aliexpress::Cache.generate_key 'promise_key'
+
+      promise = Aliexpress::Cache.fetch promise_key do
+        Aliexpress::Product.queryPromiseTemplateById
+      end
+
+      promise.templateList.sample.id
+    end
+
     it '刊登商品测试' do
       category_id = 200004358
 
@@ -55,7 +66,7 @@ describe Aliexpress::Product do
       }
 
       # 所有的 SKU 信息
-      all_sku = Aliexpress::Cache.fetch 'test_sku' do
+      all_sku = Aliexpress::Cache.fetch "test_sku_#{category_id}" do
         Aliexpress::Category.getChildAttributesResultByPostCateIdAndPath cateId: category_id
       end
 
@@ -65,12 +76,16 @@ describe Aliexpress::Product do
       # 获取类目属性，并按顺序排序
       product_skus = all_sku.attributes.reject { |item| item.sku == false }.sort_by(&:spec)
 
+      # 检查敏感词过滤， http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.findAeProductProhibitedWords&v=1
+      Aliexpress::Product.findAeProductProhibitedWords
+
+
       options = {
           subject: 'Big_Test',
           keyword: 'testkeyword',
           categoryId: category_id, # 其他特殊类中的其他测试
-          aeopAeProductSKUs: get_product_skus(product_skus).to_json, # 用来设置SKU属性
-          aeopAeProductPropertys: get_product_properties(product_property).to_json, # 设置公共产品属性
+          aeopAeProductSKUs: get_product_skus(product_skus), # 用来设置SKU属性
+          aeopAeProductPropertys: get_product_properties(product_property), # 设置公共产品属性
           deliveryTime: 7,
           detail: 'bigtest123',
           freightTemplateId: get_freight_template_id, # 运费模板
@@ -79,18 +94,19 @@ describe Aliexpress::Product do
           imageURLs: get_image_urls,
           # 可选字段 - optional fields
           productPrice: 123.00,
+          promiseTemplateId: get_promise_template_id,
           productUnit: Aliexpress::Product::Unit::PIECE,
           packageType: false,
           lotNum: 1,
           currencyCode: 'USD',
           isPackSell: false,
-          sizeChartId: 121,
+          sizechartId: 121,
           reduceStrategy: Aliexpress::ReduceStrategy::ORDER
           # bulkOrder: '',
           # bulkDiscount: ''
       }
 
-      Aliexpress::Product.postAeProduct({}, options)
+      Aliexpress::Product.postAeProduct options
     end
   end
 end

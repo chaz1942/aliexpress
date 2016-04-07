@@ -151,6 +151,7 @@ module Aliexpress
     # 调用发布商品接口api.postaeproduct前，针对商品标题等信息做违禁词相关信息查询接口
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.findAeProductProhibitedWords&v=1
     #
+    # @param categoryId, title, keywords, productProperties, detail等字符型参数
     #
     def self.findAeProductProhibitedWords(params = {})
       api_endpoint 'api.findAeProductProhibitedWords', params
@@ -288,8 +289,9 @@ module Aliexpress
     # 服务模板查询
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.queryPromiseTemplateById&v=1
     #
-    def self.queryPromiseTemplateById(params = {})
-      api_endpoint 'api.queryPromiseTemplateById', params
+    # @note id 为 0 获取全部的服务模板
+    def self.queryPromiseTemplateById(id = -1)
+      api_endpoint 'api.queryPromiseTemplateById', {templateId: id}
     end
 
     # 获取淘宝原始产品信息

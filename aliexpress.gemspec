@@ -29,7 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'redis', '>= 3.1.0'
   spec.add_dependency 'activesupport', '~> 4.0'
   spec.add_dependency 'hashie'
-  # 暴露出一个 web 界面出来， 参考
   spec.add_dependency 'sinatra'
   spec.add_dependency 'sinatra-contrib'
   spec.add_dependency 'slim'
