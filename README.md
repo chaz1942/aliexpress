@@ -101,7 +101,34 @@ Aliexpress.redis = Redis.new
 
 Rspec 的执行： `spec spec/**.rb`，相当厉害，比我之前总是 repl 环境中执行效率高多了，以后，都用这种方法。
 
-还看到 用 minitest 作为 测试库的，有机会的话下次测试用这个方式
+还看到 用 minitest 作为 测试库的，有机会的话下次测试用这个方式。
+
+批量生成文件的代码： 
+
+```
+Dir.foreach('lib/aliexpress') do |item|
+  unless Dir.exist?(item)
+    next unless  item =~ /\.rb/
+    file_name = item.match(/(.*)\.rb/)[1]
+    spec_file = "spec/#{file_name}_spec.rb"
+    next if File.exist? spec_file
+    File.open(spec_file, 'wb') do |f|
+      content = <<-DOC
+require 'aliexpress'
+
+describe Aliexpress::#{file_name.capitalize} do
+  describe '' do
+    it '' do
+
+    end
+  end
+end      
+DOC
+    f << content
+    end
+  end
+end
+```
 
 ## Contributing
 
