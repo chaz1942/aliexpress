@@ -5,6 +5,9 @@ require 'json'
 module Aliexpress
   class Base
 
+    # TODO: 多用户的关键， 在 redis key 的命名上做文章
+    # 获取 code 的过程中，可以传递一个参数，速卖通会原样返回这个参数值。此时，把这个值
+    # 与用户名生成一个 redis key
     ACCESS_TOKEN_KEY = 'aliexpress_access_token_key'.freeze
     REFRESH_TOKEN_KEY = 'aliexpress_refresh_token_key'.freeze
 

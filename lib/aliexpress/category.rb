@@ -14,7 +14,10 @@ module Aliexpress
 
   class Category < Base
     # TODO: 数据结构之类的如何存储, 使用 Struct 结构体存储
-    CATEGORY_SKU = 'category_sku'.freeze
+
+    CATEGORY_KEY = 'categories'.freeze
+
+    PRODUCT_SKU_KEY = 'product_skus'.freeze
 
     def self.get_category_property_by_cache
       
@@ -145,10 +148,9 @@ module Aliexpress
   #
   def self.cache_category(id = 0)
     tmp_category = Aliexpress::Category.getChildrenPostCategoryById(id)
-    Aliexpress.redis.hset 'categories', id, Marshal.dump(tmp_category)
+    Aliexpress.redis.hset Category::CATEGORY_KEY, id, Marshal.dump(tmp_category)
 
     tmp_category.aeopPostCategoryList.each do |category|
-
       unless category.isleaf
         cache_category(category.id)
       end
@@ -164,7 +166,7 @@ module Aliexpress
 
     CSV.open category_file, 'wb' do |csv|
       csv << headers
-      Aliexpress.redis.hgetall('categories').each do |k, v|
+      Aliexpress.redis.hgetall(Category::CATEGORY_KEY).each do |k, v|
 
         Marshal.load(v).aeopPostCategoryList.each do |category|
           puts category
@@ -177,9 +179,9 @@ module Aliexpress
   #
   # 将叶子节点三级分类的数据的数组获到
   #
-  def get_leaf_category
+  def self.get_leaf_category
     category_ids = []
-    Aliexpress.redis.hgetall('categories').each do |k, v|
+    Aliexpress.redis.hgetall(Category::CATEGORY_KEY).each do |k, v|
 
       Marshal.load(v).aeopPostCategoryList.each do |category|
         category_ids << category.id if category.isleaf
@@ -190,17 +192,17 @@ module Aliexpress
   end
 
   #
+  # 获取叶子阶段的 SKU 属性
   #
-  #
-  def get_leaf_category_sku
+  def self.get_leaf_category_sku
     sku_file = "tmp/leaf_category_sku_#{Time.now.strftime('%Y%m%d%h%m')}.csv"
 
-    headers = %w( 分类ID sku_id 中文名 英文名 子属性id 子属性中文名 子属性英文名 是否为必须)
+    headers = %w(分类ID sku_id 中文名 英文名 子属性id 子属性中文名 子属性英文名 是否为必须)
     CSV.open sku_file, 'wb' do |csv|
       csv << headers
 
       get_leaf_category.each do |k|
-        tmp_skus = Marshal.load(Aliexpress.redis.hget('product_skus', k))
+        tmp_skus = Marshal.load(Aliexpress.redis.hget(Category::PRODUCT_SKU_KEY, k))
 
         next if tmp_skus.attributes.blank?
 
@@ -225,6 +227,9 @@ module Aliexpress
   # 获取 商品三级分类 下的 sku 属性
   #
   def self.cache_product_sku
+    # 备注: 这里 文件，可以存放到 /tmp/aliexpress/category.csv, 打包到成 gem
+    # 应该不能在 tmp 目录下写入文件了, CSV.open(file, 'wb') { |csv|  csv << ['测试位无金额', '']  }
+    # 可以向还不存在的目录下，创建文件
     category_file = 'tmp/aliexpress_category_20160321Mar03.csv'
 
     category_ids = []
@@ -234,11 +239,11 @@ module Aliexpress
     end
 
     category_ids[1..-1].each do |id|
-      next if Aliexpress.redis.hexists 'product_skus', id
+      next if Aliexpress.redis.hexists Category::PRODUCT_SKU_KEY, id
 
       tmp_sku = Aliexpress::Category.getAttributesResultByCateId(id)
 
-      Aliexpress.redis.hset 'product_skus', id, Marshal.dump(tmp_sku)
+      Aliexpress.redis.hset Category::PRODUCT_SKU_KEY, id, Marshal.dump(tmp_sku)
     end
   end
 
@@ -253,7 +258,7 @@ module Aliexpress
     CSV.open sku_file, 'wb' do |csv|
       csv << headers
 
-      Aliexpress.redis.hgetall('product_skus').each do |k, v|
+      Aliexpress.redis.hgetall(Category::PRODUCT_SKU_KEY).each do |k, v|
         tmp_skus = Marshal.load(v)
         next if tmp_skus.attributes.blank?
 

@@ -91,9 +91,15 @@ Aliexpress.redis = Redis.new
 
 考虑使用 Struct 和 OpenStruct，想到最后上传和接口的使用。最后，使用了属性比较严格 Struct。
 
-实现上， 获取 access_token 的方式，参考了 https://github.com/lanrion/weixin_authorize。 
+实现上， 获取 access_token 的方式，可以参考了 https://github.com/lanrion/weixin_authorize。 
 
 **注意**：自己实现其实是平台式的，也就是 每个用户授权的 access_token 可能不一样。这会改变目前存取 access_token 的方式，从数据库中存取。
+
+参考 https://github.com/lanrion/weixin_authorize， 其实现平台级的关键在于，存放 access_token 的 redis_key（组合了app_id）。根据这个，
+实现多用户的关键， 在 redis key 的命名上做文章。 
+                                                               
+速卖通 获取 code 的过程中，可以传递一个参数，速卖通会原样返回这个参数值。此时，把这个值与用户名 或 其他什么名 生成一个 redis key。 此时，需要再
+暴露两个配置参数: access_token_key, 以及 refresh_token_key。
 
 ### Rspec 测试
 
