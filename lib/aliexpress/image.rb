@@ -8,11 +8,27 @@ module Aliexpress
       UNGROUP = 'UNGROUP'
     end
 
+
+    # 上传图片
+    #
+    # @param [String] 图品文件的地址
+    def self.uploadImageData(file)
+      # TODO - 需要判断文件的类型
+      file_name = File.basename(file)
+
+      params = {
+          srcFileName: file_name,
+          fileData: File.read(file)
+      }
+
+      self.uploadTempImage4SDK(params)
+    end
+
     # 上传图片到临时目录(推荐使用)
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.uploadTempImage4SDK&v=1
     #
-    def self.uploadTempImage4SDK(params = {})
-      api_endpoint 'api.uploadTempImage4SDK', params
+    def self.uploadTempImage4SDK(params = {}, body = {})
+      api_endpoint 'api.uploadTempImage4SDK', params, body
     end
 
     # 上传图片到临时目录
