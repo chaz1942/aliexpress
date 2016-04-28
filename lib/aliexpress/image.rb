@@ -8,27 +8,52 @@ module Aliexpress
       UNGROUP = 'UNGROUP'
     end
 
-
     # 上传图片
     #
     # @param [String] 图品文件的地址
-    def self.uploadImageData(file)
-      # TODO - 需要判断文件的类型
-      file_name = File.basename(file)
+    def self.upload_temp_image(file = '')
+      unless image_file? file
+        raise ImageTypeException, 'Image File is invalid!'
+      end
 
-      params = {
-          srcFileName: file_name,
-          fileData: File.read(file)
-      }
+      file_data = File.new(file, 'rb')
 
-      self.uploadTempImage4SDK(params)
+      params = {srcFileName: File.basename(file)}
+
+      body = {
+          fileData: file_data,
+          multipart: true
+      }.merge! params
+
+      self.uploadTempImage4SDK(params, body)
+    rescue => e
+      logger.info e
     end
 
-    # 上传图片到临时目录(推荐使用)
-    # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.uploadTempImage4SDK&v=1
+    # 上传文件到图片银行
     #
-    def self.uploadTempImage4SDK(params = {}, body = {})
-      api_endpoint 'api.uploadTempImage4SDK', params, body
+    # @param [String] file - 图片文件
+    def self.upload_image(file)
+      unless image_file? file
+        raise ImageTypeException, 'Image File is invalid!'
+      end
+
+      file_name = File.basename(file, group_id = 'picture')
+      file_data = File.new(file, 'rb')
+
+      params = {
+          fileName: file_name,
+          groupId: group_id
+      }
+
+      body = {
+          imageBytes: file_data,
+          multipart: true
+      }.merge!(params)
+
+      self.uploadImage4SDK(params, body)
+    rescue => e
+      logger.info e
     end
 
     # 上传图片到临时目录
@@ -36,13 +61,6 @@ module Aliexpress
     #
     def self.uploadTempImage(params = {})
       api_endpoint 'api.uploadTempImage', params
-    end
-
-    # 上传图片到图片银行(推荐使用)
-    # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.uploadImage4SDK&v=1
-    #
-    def self.uploadImage4SDK(params = {})
-      api_endpoint 'api.uploadImage4SDK', params
     end
 
     # 根据path查询图片信息
@@ -86,6 +104,37 @@ module Aliexpress
     def self.listImagePagination(params = {})
       params.merge!(currentPage: 1, pageSize: 6, locationType: LocationType::ALL_GROUP)
       api_endpoint 'api.listImagePagination', params
+    end
+    
+    private
+
+    # 上传图片到临时目录(推荐使用)
+    # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.uploadTempImage4SDK&v=1
+    #
+    def self.uploadTempImage4SDK(params = {}, body = {})
+      headers = {
+          'Content-Type' => 'multipart/form-data'
+      }
+
+      api_endpoint 'api.uploadTempImage4SDK', params, body, headers
+    end
+
+    # 上传图片到图片银行(推荐使用)
+    # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.uploadImage4SDK&v=1
+    #
+    def self.uploadImage4SDK(params = {}, body = {})
+      api_endpoint 'api.uploadImage4SDK', params, body
+    end
+
+    # 判断 文件是否是图片
+    #
+    # @param [String] file - 图片文件
+    def self.image_file?(file)
+      if File.exist?(file)
+        type = MIME::Types.type_for(file).first
+
+        type.media_type == 'image'
+      end
     end
   end
 end

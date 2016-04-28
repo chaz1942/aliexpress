@@ -20,8 +20,14 @@ module Aliexpress
     # @param [Hash] params - api 的应用级参数
     # @param [Hash] body - api 请求body
     #
-    def self.api_endpoint(api_name, params = {}, body = {})
-      _api_endpoint(api_name: api_name, params: params, body: body)
+    def self.api_endpoint(api_name, params = {}, body = {}, headers = {})
+      options = {
+          headers: headers,
+          params: params,
+          body: body
+      }
+
+      _api_endpoint(api_name: api_name, options: options)
     end
 
     protected
@@ -143,6 +149,7 @@ module Aliexpress
     # 例子： OpenSSL::HMAC.hexdigest OpenSSL::Digest.new('sha1'), '1FyHgep5Mkh', 'param2/1/aliexpress.open/api.getChildrenPostCategoryById/44872398cateId0'
     #
     # @note Digest::HMAC.hexdigest ruby2.1.5 还支持，2.3.0 就不支持了。
+    # digest 方法存在两个版本:  hexdigest 版本
     def self.get_signature(signature_factor)
       OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), app_secret, signature_factor).upcase
       # Digest::HMAC.hexdigest(signature_factor, secret_key, Digest::SHA1).upcase
@@ -162,8 +169,10 @@ module Aliexpress
     #       特定的请求，需要设定请求提供
     #
     # @return [Hash] 请求返回的相应
-    def self._api_endpoint(api_version: 1, api_namespace: 'aliexpress.open', api_name: 'dev.test', params: {}, protocol: 'param2', body: {})
+    def self._api_endpoint(api_version: 1, api_namespace: 'aliexpress.open', api_name: '', protocol: 'param2', options: {})
       url_path = "#{protocol}/#{api_version}/#{api_namespace}/#{api_name}/#{app_key}"
+
+      params = options[:params] || {}
 
       params.merge!({access_token: access_token
                      # _aop_timestamp: Time.now.to_i * 1000
@@ -181,21 +190,13 @@ module Aliexpress
 
       params.merge! _aop_signature: signature
 
-      tmp_url = "#{api_url}/#{url_path}?#{Nestful::Helpers.to_url_param params}"
+      tmp_url = "#{api_url}/#{url_path}?#{Helpers.to_url_param params}"
 
       puts "Request URL：#{tmp_url}"
 
-      request = Nestful::Request.new tmp_url, method: :post, format: :json
-
-      if body.present?
-        request.body = Nestful::Helpers.to_url_param body
-
-        puts "Request Body: #{request.body}"
-      end
-
       start_time = Time.now
 
-      response = request.execute
+      response = RestClient.post tmp_url, options[:body], options[:headers]
 
       cost_time = Time.now - start_time
 
@@ -204,7 +205,9 @@ module Aliexpress
       puts "Response Result: #{response}"
 
       # TODO: 根据获取的返回值，抛出异常，刷新访问 token
-      ::Hashie::Mash.new JSON.parse(response.body)
+      ::Hashie::Mash.new JSON.parse(response)
+    rescue => e
+      logger.info e
     end
   end
 end

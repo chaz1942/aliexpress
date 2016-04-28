@@ -101,6 +101,38 @@ Aliexpress.redis = Redis.new
 速卖通 获取 code 的过程中，可以传递一个参数，速卖通会原样返回这个参数值。此时，把这个值与用户名 或 其他什么名 生成一个 redis key。 此时，需要再
 暴露两个配置参数: access_token_key, 以及 refresh_token_key。
 
+遇到问题，如何上传数据数据。
+
+## 将 Nestful 替换为 RestClient
+
+重大问题： Nestful 的 post 请求对支持 upload Image 文件不太好。不太支持 `multipart: true`。 因此，将 Nestful 替换为 RestClient: 
+
+为此，做出的修改： 
+
+1. 将 Nestful::Helpers 拷贝到本地，成为 Aliexpress::Helpers
+2. 替换发送请求的部分： 
+ 
+```
+start_time = Time.now
+
+# response = request.execute
+# 将 RestClient 替换 Nestful
+response = RestClient.post tmp_url, options[:body], options[:headers]
+
+cost_time = Time.now - start_time
+
+# request = Nestful::Request.new tmp_url, method: :post, headers: options[:headers]
+
+# if options[:body].present?
+#   request.body = Helpers.to_url_param options[:body]
+# end
+
+# puts "Request Body: #{request.body}"
+```
+
+备注： 但是 RestClient 的 Response 就比较的弱， 一旦请求不合理，就抛异常。即使这个时候，响应的字符串也是有用的。
+
+
 ### Rspec 测试
 
 第一次写测试，好兴奋。

@@ -40,5 +40,8 @@ module Aliexpress
     mattr_accessor :access_token
 
     mattr_accessor :refresh_token
+
+    mattr_accessor :logger
+    self.logger = Logger.new(STDOUT)
   end
 end
