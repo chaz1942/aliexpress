@@ -56,6 +56,22 @@ module Aliexpress
       logger.info e
     end
 
+    # 查询图片列表
+    #
+    # @param [Fixnum] per - 当前页数
+    # @param [Fixnum] page - 页面的列表数
+    def self.list_image(per = 1, page = 6, type = LocationType::ALL_GROUP)
+      params = {
+          currentPage: per,
+          pageSize: page,
+          locationType: type
+      }
+
+      response = self.listImagePagination(params)
+
+      response.images.map(&:url)
+    end
+
     # 上传图片到临时目录
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.uploadTempImage&v=1
     #
@@ -98,15 +114,14 @@ module Aliexpress
       api_endpoint 'api.listGroup', params
     end
 
+    private
+
     # 图片银行列表分页查询
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.listImagePagination&v=1
     #
     def self.listImagePagination(params = {})
-      params.merge!(currentPage: 1, pageSize: 6, locationType: LocationType::ALL_GROUP)
       api_endpoint 'api.listImagePagination', params
     end
-    
-    private
 
     # 上传图片到临时目录(推荐使用)
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.uploadTempImage4SDK&v=1

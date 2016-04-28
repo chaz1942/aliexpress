@@ -17,5 +17,11 @@ describe Aliexpress::Image do
 
       expect(response.photoBankImageGroupList.class).to eq(Array)
     end
+
+    it '查询图片列表' do
+      images = Aliexpress::Image.list_image
+
+      expect(images.class).to eq(Array)
+    end
   end
 end      
