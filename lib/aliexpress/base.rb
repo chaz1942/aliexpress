@@ -106,7 +106,7 @@ module Aliexpress
 
       puts token_url
 
-      response = JSON.parse Nestful.post(token_url)
+      response = JSON.parse RestClient.post(token_url, {})
 
       puts response
 
@@ -130,7 +130,7 @@ module Aliexpress
       token_url = "#{refresh_token_url}/#{app_key}?#{options.map { |k, v| "#{k}=#{v}" }.join('&')}"
 
       # RestClient 发送 post 请求，报 RestClient::BadRequest: 400 Bad Request
-      response = JSON.parse Nestful.post token_url, {}
+      response = JSON.parse RestClient.post(token_url, {})
 
       puts response
 
@@ -204,10 +204,15 @@ module Aliexpress
 
       puts "Response Result: #{response}"
 
-      # TODO: 根据获取的返回值，抛出异常，刷新访问 token
+      # TODO: 根据获取的返回值，抛出异常，刷新 Refresh Token - 过期的时间是半年
       ::Hashie::Mash.new JSON.parse(response)
     rescue => e
-      logger.info e
+      if e.is_a? RestClient::ExceptionWithResponse
+        puts "Response Code: #{e.message}"
+        puts "Response Boby: #{e.http_body}"
+      else
+        logger.info e
+      end
     end
   end
 end

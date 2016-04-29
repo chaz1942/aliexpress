@@ -52,7 +52,7 @@ module Aliexpress
       puts "token_url = #{tmp_url}"
 
       # RestClient 发送 post 请求，报 RestClient::BadRequest: 400 Bad Request
-      response = JSON.parse Nestful.post(tmp_url)
+      response = JSON.parse RestClient.post(tmp_url, {})
 
       puts "response = #{response}"
 

@@ -1,3 +1,5 @@
+# Modified from https://github.com/maccman/nestful/blob/master/lib/nestful/helpers.rb
+
 require 'uri'
 
 module Aliexpress

@@ -132,6 +132,7 @@ cost_time = Time.now - start_time
 
 备注： 但是 RestClient 的 Response 就比较的弱， 一旦请求不合理，就抛异常。即使这个时候，响应的字符串也是有用的。
 
+后来，想到在异常中打印响应的 body，基本实现了 Nestful 响应的功能响应的功能。
 
 ### Rspec 测试
 

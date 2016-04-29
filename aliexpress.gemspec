@@ -25,7 +25,6 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  # spec.add_dependency 'nestful'
   spec.add_dependency 'redis', '>= 3.1.0'
   spec.add_dependency 'activesupport', '~> 4.0'
   spec.add_dependency 'hashie'
@@ -33,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'sinatra-contrib'
   spec.add_dependency 'slim'
   # spec.add_dependency 'sass'
-  spec.add_dependency 'rest-client'
+  spec.add_dependency 'rest-client', '~> 1.8.0'
   # spec.add_dependency 'coffee-script'
 
   # 开发使用 gem 包, 参考 weixin_authorize

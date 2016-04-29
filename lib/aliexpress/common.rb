@@ -32,7 +32,7 @@ module Aliexpress
     def self.adjust_time
       current_time_url = "#{api_url}/param2/1/system/currentTime/#{app_key}"
 
-      response = Nestful.get(current_time_url)
+      response = RestClient.get(current_time_url)
 
       puts "response = #{response}"
 

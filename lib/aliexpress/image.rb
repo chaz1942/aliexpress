@@ -114,8 +114,6 @@ module Aliexpress
       api_endpoint 'api.listGroup', params
     end
 
-    private
-
     # 图片银行列表分页查询
     # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.listImagePagination&v=1
     #
@@ -140,6 +138,8 @@ module Aliexpress
     def self.uploadImage4SDK(params = {}, body = {})
       api_endpoint 'api.uploadImage4SDK', params, body
     end
+
+    private
 
     # 判断 文件是否是图片
     #
