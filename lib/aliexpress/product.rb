@@ -70,7 +70,6 @@ module Aliexpress
     def self.default
 
     end
-
   end
 
   # 商品的基本信息 - 参数
@@ -131,6 +130,35 @@ module Aliexpress
       SQUARE_YARD = 100078609 # 平方码
       TON = 100000020 # 吨
       YARD = 100078558 # 码
+    end
+
+    # 产品业务状态
+    module StatusType
+      # 上架
+      ON_SELL = 'onSelling'
+
+      # 下架
+      OFFLINE = 'offline'
+
+      # 审核中
+      AUDIT = 'auditing'
+
+      # 审核不通过
+      EDIT = 'editingRequired'
+    end
+
+    # 获取商品列表
+    def self.get_products(params = {})
+      params[:page] ||= 20
+      params[:per] ||= 1
+
+      params = {
+          productStatusType: StatusType::ON_SELL,
+          pageSize: params[:page],
+          currentPage: params[:per]
+      }
+
+      self.findProductInfoListQuery params
     end
 
     # 卖家可以通过这个接口发布一个多语言商品。一次只能发布一种多语言商品
