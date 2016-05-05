@@ -160,6 +160,11 @@ module Aliexpress
 
       self.findProductInfoListQuery params
     end
+    
+    # 获取单个商品的信息
+    def self.get_product(id = '32356501891')
+      findAeProductById productId: id
+    end
 
     # 卖家可以通过这个接口发布一个多语言商品。一次只能发布一种多语言商品
     # 地址: http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=alibaba.product.postMultilanguageAeProduct&v=1

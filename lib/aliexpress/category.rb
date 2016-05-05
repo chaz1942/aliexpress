@@ -22,6 +22,10 @@ module Aliexpress
     def self.get_category_property_by_cache
       
     end
+    
+    def self.get_category(id = 0)
+      getPostCategoryById id
+    end
 
     # 获取下级目录的类目信息
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.getChildrenPostCategoryById&v=1
