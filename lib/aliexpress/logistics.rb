@@ -2,6 +2,11 @@
 module Aliexpress
   class Logistics < Base
 
+    # 获取物流公司
+    def get_logistics_companys
+      qureyWlbDomesticLogisticsCompany
+    end
+
     # 获取中国身份
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.getAllProvince&v=1
     #
@@ -13,7 +18,11 @@ module Aliexpress
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.getNextLevelAddressData&v=1
     #
     # @param [Hash] params - 应用参数
-    def self.getNextLevelAddressData(params = {})
+    def self.getNextLevelAddressData(area_id = 0)
+      params = {
+          areaId: area_id
+      }
+
       api_endpoint 'api.getNextLevelAddressData', params
     end
 
