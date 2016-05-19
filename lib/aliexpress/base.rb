@@ -47,6 +47,13 @@ module Aliexpress
     #
     # @return 返回 refresh_token
     def self.refresh_token
+      get_refresh_token
+    end
+
+    # 通过 redis 获取 refresh_token, 并设置过期时间
+    #
+    # @return 返回 refresh_token
+    def self.get_refresh_token
       token = redis.get REFRESH_TOKEN_KEY
 
       if token.present?
@@ -93,31 +100,37 @@ module Aliexpress
     # 重新获取 access_token
     #
     def self.refresh_access_token
-      token_url = 'https://gw.api.alibaba.com/openapi/param2/1/system.oauth2/getToken'
-
-      options = {
-          grant_type: 'refresh_token',
-          client_id: app_key,
-          client_secret: app_secret,
-          refresh_token: refresh_token
-      }
-
-      token_url = "#{token_url}/#{app_key}?#{options.map { |k, v| "#{k}=#{v}" }.join('&')}"
-
-      puts token_url
-
-      response = JSON.parse RestClient.post(token_url, {})
+      response = get_access_token
 
       puts response
 
       set_access_token(response)
     end
 
+    #
+    # 获取 access_token
+    #
+    def self.get_access_token(token = get_refresh_token)
+      token_url = 'https://gw.api.alibaba.com/openapi/param2/1/system.oauth2/getToken'
+
+      options = {
+          grant_type: 'refresh_token',
+          client_id: app_key,
+          client_secret: app_secret,
+          refresh_token: token
+      }
+
+      token_url = "#{token_url}/#{app_key}?#{options.map { |k, v| "#{k}=#{v}" }.join('&')}"
+
+      puts token_url
+
+      JSON.parse RestClient.post(token_url, {})
+    end
 
     #
     # 在 refresh_token 未过期前重新请求 refresh_token
     #
-    def self.get_refresh_token
+    def self.refresh_refresh_token
       refresh_token_url = 'https://gw.api.alibaba.com/openapi/param2/1/system.oauth2/postponeToken'
 
       options = {
@@ -163,9 +176,8 @@ module Aliexpress
     # @param api_version - API 版本
     # @param api_namespace - API 命名空间
     #
-    #
-    # @note urlPath 的规则: 将除了 _aop_signature 以外的其他所有参数都加入 signature 的生成
-    #       大多数的接口是不需要 _aop_timestamp(以毫秒表示)
+    # @note urlPath 的规则: 将除了 +_aop_signature+ 以外的其他所有参数都加入 signature 的生成
+    #       大多数的接口是不需要 +_aop_timestamp+ (以毫秒表示)
     #       特定的请求，需要设定请求提供
     #
     # @return [Hash] 请求返回的相应
@@ -174,9 +186,11 @@ module Aliexpress
 
       params = options[:params] || {}
 
-      params.merge!({access_token: access_token
-                     # _aop_timestamp: Time.now.to_i * 1000
-                    })
+      unless params[:access_token].present?
+        params.merge!({access_token: access_token
+                       # _aop_timestamp: Time.now.to_i * 1000
+                      })
+      end
 
       signature_factor = url_path.clone
 

@@ -59,6 +59,13 @@ module Aliexpress
       set_access_token response
 
       set_refresh_token response
+    rescue => e
+      if e.is_a? RestClient::ExceptionWithResponse
+        puts "Response Code: #{e.message}"
+        puts "Response Boby: #{e.http_body}"
+      else
+        logger.info e
+      end
     end
   end
 end
