@@ -76,13 +76,10 @@ end
 使用: 
 
 ```
-params[:page] ||= 20
-params[:per] ||= 1
-
 params.merge!({
     productStatusType: StatusType::ON_SELL,
-    pageSize: params[:page],
-    currentPage: params[:per]
+    pageSize: 20,
+    currentPage: 1
 })
 
 Aliexpress::Product.findProductInfoListQuery params
@@ -102,13 +99,10 @@ Aliexpress.refresh_token = 'xxx' # 半年过期一次
 多用户: 每次访问时，需要传入用户特定的 `access_token`，使用如下:
 
 ```
-params[:page] ||= 20
-params[:per] ||= 1
-
 params.merge!({
     productStatusType: StatusType::ON_SELL,
-    pageSize: params[:page],
-    currentPage: params[:per],
+    pageSize: 20,
+    currentPage: 1
     access_token: self.access_token(account_refresh_token_key, account_access_token_key)
 })
 

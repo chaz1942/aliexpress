@@ -56,9 +56,11 @@ module Aliexpress
 
       puts "response = #{response}"
 
-      set_access_token response
+      token_key = get_access_token_key params[:state]
 
-      set_refresh_token response, params[:state]
+      set_refresh_token(response, params[:state])
+
+      set_access_token response, token_key
     rescue => e
       if e.is_a? RestClient::ExceptionWithResponse
         puts "Response Code: #{e.message}"

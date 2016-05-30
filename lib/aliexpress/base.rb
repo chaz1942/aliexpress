@@ -32,8 +32,8 @@ module Aliexpress
 
     protected
 
-    def self.get_access_token_key(name = '')
-      name.blank? ? ACCESS_TOKEN_KEY : Digest::MD5.hexdigest("access_token_#{CGI.escape(name)}")
+    def self.get_access_token_key(refresh_key = '')
+      refresh_key.blank? ? ACCESS_TOKEN_KEY : Digest::MD5.hexdigest("access_token_#{refresh_key}")
     end
 
     def self.get_refresh_token_key(name = '')
