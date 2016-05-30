@@ -37,14 +37,14 @@ module Aliexpress
     #     "refresh_token": "",
     #     "access_token": ""
     # }
-    def self.get_access_token_by_code(code = '')
+    def self.get_access_token_by_params(params)
       options = {
           grant_type: 'authorization_code',
           client_id: app_key,
           client_secret: app_secret,
           redirect_uri: redirect_uri,
           need_refresh_token: true,
-          code: code
+          code: params[:code]
       }
 
       tmp_url =  "#{token_url}/#{app_key}?#{options.map { |k, v| "#{k}=#{v}" }.join('&')}"
@@ -58,7 +58,7 @@ module Aliexpress
 
       set_access_token response
 
-      set_refresh_token response
+      set_refresh_token response, params[:state]
     rescue => e
       if e.is_a? RestClient::ExceptionWithResponse
         puts "Response Code: #{e.message}"

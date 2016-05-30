@@ -5,8 +5,8 @@ module Aliexpress
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.queryProductBusinessInfoById&v=1
     #
     # @param [Fixnum] id -
-    def self.queryProductBusinessInfoById(id = 0)
-      api_endpoint 'api.queryProductBusinessInfoById', productId: id
+    def self.queryProductBusinessInfoById(id = 0, access_token)
+      api_endpoint 'api.queryProductBusinessInfoById', { productId: id, access_token: access_token }
     end
 
     # 查询商品每日浏览量

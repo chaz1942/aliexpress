@@ -101,7 +101,15 @@ Aliexpress.redis = Redis.new
 速卖通 获取 code 的过程中，可以传递一个参数，速卖通会原样返回这个参数值。此时，把这个值与用户名 或 其他什么名 生成一个 redis key。 此时，需要再
 暴露两个配置参数: access_token_key, 以及 refresh_token_key。
 
-遇到问题，如何上传数据数据。
+多用户，每次调用，都要传递 access_token。并且，将 token 的函数也做了一些修改。
+
+遇到问题，如何上传图片。
+
+## 多用户的支持
+
+在请求任何接口时，添加一个 `access_token` 的参数支持:
+
+
 
 ## 将 Nestful 替换为 RestClient
 

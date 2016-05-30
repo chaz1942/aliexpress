@@ -32,15 +32,26 @@ module Aliexpress
 
     protected
 
+    def self.get_access_token_key(name = '')
+      name.blank? ? ACCESS_TOKEN_KEY : Digest::MD5.hexdigest("access_token_#{CGI.escape(name)}")
+    end
+
+    def self.get_refresh_token_key(name = '')
+      name.blank? ? REFRESH_TOKEN_KEY : Digest::MD5.hexdigest("refresh_token_#{CGI.escape(name)}")
+    end
+
     # 通过 redis 获取 token，并设置过期时间
     #
+    # @param [String] refresh_token_key
+    # @param [String] access_token_key
+    #
     # @return 返回获取 access_token
-    def self.access_token
-      token = redis.get ACCESS_TOKEN_KEY
+    def self.access_token(refresh_token_key = get_refresh_token_key, access_token_key = get_access_token_key)
+      token = redis.get access_token_key
 
       return token if token.present?
 
-      refresh_access_token
+      refresh_access_token(access_token_key, refresh_token_key)
     end
 
     # 通过 redis 获取 refresh_token, 并设置过期时间
@@ -53,8 +64,10 @@ module Aliexpress
     # 通过 redis 获取 refresh_token, 并设置过期时间
     #
     # @return 返回 refresh_token
-    def self.get_refresh_token
-      token = redis.get REFRESH_TOKEN_KEY
+    def self.get_refresh_token(redis_key = get_refresh_token_key)
+      puts "refresh_token_key: #{redis_key}"
+
+      token = redis.get redis_key
 
       if token.present?
         token
@@ -64,47 +77,6 @@ module Aliexpress
     rescue => e
       puts e
       puts 'should redirect to Authorization.get_auth_url'
-    end
-
-    #
-    # 设置访问 token
-    #
-    # @param response [Hash] - 获取
-    def self.set_access_token(response)
-      token = response['access_token']
-
-      redis.multi do
-        redis.set ACCESS_TOKEN_KEY, token
-        redis.expire ACCESS_TOKEN_KEY, response['expires_in']
-      end
-
-      token
-    end
-
-    #
-    # 设置 refresh code
-    #
-    # @param response [Hash] - 接口返回的值
-    def self.set_refresh_token(response)
-      token = response['refresh_token']
-
-      redis.multi do
-        redis.set REFRESH_TOKEN_KEY, token
-        redis.expireat REFRESH_TOKEN_KEY, Time.parse(response['refresh_token_timeout'])
-      end
-
-      token
-    end
-
-    #
-    # 重新获取 access_token
-    #
-    def self.refresh_access_token
-      response = get_access_token
-
-      puts response
-
-      set_access_token(response)
     end
 
     #
@@ -125,6 +97,47 @@ module Aliexpress
       puts token_url
 
       JSON.parse RestClient.post(token_url, {})
+    end
+
+    #
+    # 设置访问 token
+    #
+    # @param response [Hash] - 获取
+    def self.set_access_token(response, redis_key = get_access_token_key)
+      token = response['access_token']
+
+      redis.multi do
+        redis.set redis_key, token
+        redis.expire redis_key, response['expires_in']
+      end
+
+      token
+    end
+
+    #
+    # 设置 refresh code
+    #
+    # @param response [Hash] - 接口返回的值
+    def self.set_refresh_token(response, redis_key = get_refresh_token_key)
+      token = response['refresh_token']
+
+      redis.multi do
+        redis.set redis_key, token
+        redis.expireat redis_key, Time.parse(response['refresh_token_timeout'])
+      end
+
+      token
+    end
+
+    #
+    # 重新获取 access_token
+    #
+    def self.refresh_access_token(access_token_key, refresh_token_key)
+      refresh_token = get_refresh_token refresh_token_key
+
+      response = get_access_token refresh_token
+
+      set_access_token(response, access_token_key)
     end
 
     #

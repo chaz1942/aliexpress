@@ -5,8 +5,8 @@ module Aliexpress
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=findSellerCouponActivity&v=1
     #
     #
-    def self.findSellerCouponActivity(id = 0)
-      api_endpoint 'findSellerCouponActivity', { activityId: id }
+    def self.findSellerCouponActivity(id = 0, access_token)
+      api_endpoint 'findSellerCouponActivity', { activityId: id, access_token: access_token }
     end
 
     # coupon 活动查询

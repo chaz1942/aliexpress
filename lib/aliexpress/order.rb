@@ -38,7 +38,8 @@ module Aliexpress
             pageSize: params[:per],
             orderStatus: params[:status],
             createDateStart: Time.now - 1.years,
-            createDateEnd: Time.now
+            createDateEnd: Time.now,
+            access_token: params[:access_token]
         }
 
         findOrderListQuery options

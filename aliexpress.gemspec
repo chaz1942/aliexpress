@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['jhqy2011@gmail.com']
 
   spec.summary       = %q{aliexpress: 包装速卖通 API 的 gem }
-  spec.description   = %q{ 出于工作需要，对阿里速卖通的 api 进行 Ruby sdk 封装, 从而方便自己使用 }
+  spec.description   = %q{对阿里速卖通的 api 进行 Ruby sdk 封装, 学习并模仿编写gem, 主要使用在 http://www.kjds.com/ 中。}
   spec.homepage      = 'https://github.com/xiajian/aliexpress'
   spec.license       = 'MIT'
 
@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'redis', '>= 3.0.0'
+  spec.add_dependency 'redis-namespace'
   spec.add_dependency 'activesupport', '~> 4.0'
   spec.add_dependency 'hashie'
   spec.add_dependency 'sinatra'
@@ -39,7 +40,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 1.8'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
-  spec.add_development_dependency 'redis-namespace'
   spec.add_development_dependency 'codeclimate-test-reporter'
   spec.add_development_dependency 'simplecov', '~> 0.10.0'
   spec.add_development_dependency 'coveralls', '~> 0.8.2'

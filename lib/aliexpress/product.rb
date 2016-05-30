@@ -153,11 +153,11 @@ module Aliexpress
         params[:page] ||= 20
         params[:per] ||= 1
 
-        params = {
+        params.merge!({
             productStatusType: StatusType::ON_SELL,
             pageSize: params[:page],
             currentPage: params[:per]
-        }
+        })
 
         findProductInfoListQuery params
       end
@@ -243,8 +243,8 @@ module Aliexpress
       # 查询当前用户在指定类目下可用的尺码模版信息。
       # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.getSizeChartInfoByCategoryId&v=1
       #
-      def getSizeChartInfoByCategoryId(id = 0)
-        api_endpoint 'api.getSizeChartInfoByCategoryId', {categoryId: id}
+      def getSizeChartInfoByCategoryId(id = 0, access_token)
+        api_endpoint 'api.getSizeChartInfoByCategoryId', {categoryId: id, access_token: access_token}
       end
 
       # 修改商品所引用的尺码模板
@@ -328,8 +328,13 @@ module Aliexpress
       # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.queryPromiseTemplateById&v=1
       #
       # @note id 为 0 获取全部的服务模板
-      def queryPromiseTemplateById(id = -1)
-        api_endpoint 'api.queryPromiseTemplateById', {templateId: id}
+      def queryPromiseTemplateById(id = -1, access_token)
+        params = {
+            templateId: id,
+            access_token: access_token
+        }
+
+        api_endpoint 'api.queryPromiseTemplateById', params
       end
 
       # 获取淘宝原始产品信息

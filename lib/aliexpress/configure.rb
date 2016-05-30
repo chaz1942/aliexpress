@@ -33,9 +33,8 @@ module Aliexpress
     mattr_accessor :project_url
     self.project_url = '/'
 
-    # redis 链接配置
+    # redis 配置
     mattr_accessor :redis
-    self.redis = Redis.new password: 'Fy958e5mmyb7Ta4H'
 
     mattr_accessor :access_token
 

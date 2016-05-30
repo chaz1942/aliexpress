@@ -18,9 +18,10 @@ module Aliexpress
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.getNextLevelAddressData&v=1
     #
     # @param [Hash] params - 应用参数
-    def self.getNextLevelAddressData(area_id = 0)
+    def self.getNextLevelAddressData(area_id = 0, access_token)
       params = {
-          areaId: area_id
+          areaId: area_id,
+          access_token: access_token
       }
 
       api_endpoint 'api.getNextLevelAddressData', params

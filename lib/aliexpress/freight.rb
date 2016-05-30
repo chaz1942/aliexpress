@@ -12,7 +12,7 @@ module Aliexpress
     # 通过模板ID获取运费模板的详细信息
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.getFreightSettingByTemplateQuery&v=1
     #
-    def self.getFreightSettingByTemplateId(id = 0)
+    def self.getFreightSettingByTemplateId(id = 0, access_token)
       api_endpoint 'api.getFreightSettingByTemplateQuery', { templateId: id }
     end
 
