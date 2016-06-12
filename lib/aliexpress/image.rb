@@ -1,3 +1,5 @@
+require 'open-uri'
+
 module Aliexpress
   class Image < Base
     module LocationType
@@ -11,14 +13,14 @@ module Aliexpress
     # 上传图片
     #
     # @param [String] 图品文件的地址
-    def self.upload_temp_image(file = '')
+    def self.upload_temp_image(file = '', access_token)
       unless image_file? file
         raise ImageTypeException, 'Image File is invalid!'
       end
 
       file_data = File.new(file, 'rb')
 
-      params = {srcFileName: File.basename(file)}
+      params = {srcFileName: File.basename(file), access_token: access_token }
 
       body = {
           fileData: file_data,
@@ -28,6 +30,32 @@ module Aliexpress
       self.uploadTempImage4SDK(params, body)
     rescue => e
       logger.info e
+    end
+
+    # 从 url 中上传文件
+    #
+    # 上传图片到 阿里的 cdn, 从而方便刊登商品
+    def self.upload_image_from_url(url, access_token)
+      upload_temp_image download(url), access_token
+    end
+
+    # 下载文件 - 依赖本地的 tmp 文件
+    def self.download(url, file = '')
+      if file.blank?
+        file = "/tmp/#{url.scan(/.*\/([^\/]*)/).flatten.try(:first)}"
+      end
+
+      if File.exist? file
+        `rm -rf #{file}`
+      end
+
+      File.open(file, 'wb') do |saved_file|
+        open(url, 'rb') do |read_file|
+          saved_file.write(read_file.read)
+        end
+      end
+
+      file
     end
 
     # 上传文件到图片银行
