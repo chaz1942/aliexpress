@@ -217,9 +217,12 @@ module Aliexpress
 
       params.merge! _aop_signature: signature
 
-      tmp_url = "#{api_url}/#{url_path}?#{Helpers.to_url_param params}"
+      # tmp_url = "#{api_url}/#{url_path}?#{Helpers.to_url_param params}"
+      tmp_url = "#{api_url}/#{url_path}"
 
       puts "Request URL：#{tmp_url}"
+
+      puts "Request Body: #{options[:body].merge!(params)}"
 
       start_time = Time.now
 

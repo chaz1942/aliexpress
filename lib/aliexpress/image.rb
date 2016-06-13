@@ -35,11 +35,16 @@ module Aliexpress
     # 从 url 中上传文件
     #
     # 上传图片到 阿里的 cdn, 从而方便刊登商品
+    #
+    # @note 实际上，速卖通可能不支持 png 等格式的图片
     def self.upload_image_from_url(url, access_token)
+      puts 'Note: 不支持 png 格式的图片'
       upload_temp_image download(url), access_token
     end
 
-    # 下载文件 - 依赖本地的 tmp 文件
+    # 下载文件 - 依赖本地的 tmp 目录
+    #
+    # 参考: http://stackoverflow.com/questions/2263540/how-do-i-download-a-binary-file-over-http
     def self.download(url, file = '')
       if file.blank?
         file = "/tmp/#{url.scan(/.*\/([^\/]*)/).flatten.try(:first)}"
