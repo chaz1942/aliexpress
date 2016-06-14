@@ -1,27 +1,29 @@
 doctype html
 html
   head
-    title 阿里速卖通授权页面
+    title 速卖通授权页面
     script src='//cdn.bootcss.com/jquery/2.2.0/jquery.min.js'
   body
-    h3 等待下次 refresh token 过期，再用这个页面。获取并刷新 token
+    h3 正在授权，请稍后。。。。  　
 
-    p
+    /h3 等待下次 refresh token 过期，再用这个页面。获取并刷新 token
+    /p
       | 记住，设置的地址是 /aliexpress/auth
 
-    code data-lang="ruby" class="language-ruby"
+    /code data-lang="ruby" class="language-ruby"
       span require 'aliexpress/web'
       br
       span mount Aliexpress::Web => '/aliexpress/auth'
 
-    br
-    span 倒计时
-    .timer 20
+    /br
+    /span 倒计时
+    /.timer 20
 
 javascript:
   $(function(){
     var timer = setInterval(function() {
-      var time = parseInt($('.timer').html().trim());
+      //var time = parseInt($('.timer').html().trim());
+      var time = 3;
       if(time == 0) {
         clearInterval(timer);
         window.location.href = '/sells/b2c_platforms';

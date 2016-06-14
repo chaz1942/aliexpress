@@ -7,6 +7,11 @@ module Aliexpress
     get '/' do
       puts "params = #{params}"
 
+      if params[:code].blank? && params[:state].blank?
+        redirect '/sells/b2c_platforms'
+        return
+      end
+
       Aliexpress::Authorization.get_access_token_by_params params
 
       slim :index

@@ -224,13 +224,7 @@ module Aliexpress
 
       puts "Request Body: #{options[:body].merge!(params)}"
 
-      start_time = Time.now
-
-      response = RestClient.post tmp_url, options[:body], options[:headers]
-
-      cost_time = Time.now - start_time
-
-      puts "Time Cost: #{cost_time} s"
+      response = Profile.prof { RestClient.post tmp_url, options[:body], options[:headers] }
 
       puts "Response Result: #{response}"
 
