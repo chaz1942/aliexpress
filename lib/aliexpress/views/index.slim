@@ -21,9 +21,9 @@ html
 
 javascript:
   $(function(){
+    var time = 3;
     var timer = setInterval(function() {
       //var time = parseInt($('.timer').html().trim());
-      var time = 3;
       if(time == 0) {
         clearInterval(timer);
         window.location.href = '/sells/b2c_platforms';
