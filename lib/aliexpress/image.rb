@@ -66,7 +66,7 @@ module Aliexpress
     # 上传文件到图片银行
     #
     # @param [String] file - 图片文件
-    def self.upload_image(file)
+    def self.upload_image(file, access_token = '')
       unless image_file? file
         raise ImageTypeException, 'Image File is invalid!'
       end
@@ -75,8 +75,9 @@ module Aliexpress
       file_data = File.new(file, 'rb')
 
       params = {
+          groupId: group_id,
           fileName: file_name,
-          groupId: group_id
+          access_token: access_token
       }
 
       body = {
@@ -176,6 +177,7 @@ module Aliexpress
 
     # 判断 文件是否是图片
     #
+    # @note: 好搓的判断方法，根据文件的扩展名
     # @param [String] file - 图片文件
     def self.image_file?(file)
       if File.exist?(file)

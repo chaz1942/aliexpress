@@ -85,6 +85,12 @@ params.merge!({
 Aliexpress::Product.findProductInfoListQuery params
 ```
 
+## 授权流程
+
+参考: 速卖通官方授权的流程。
+
+
+
 ## 多用户 和 单用户的区别
 
 存储都是使用 redis，关键在于 key 。

@@ -15,15 +15,15 @@ module Aliexpress
   class Category < Base
     # TODO: 数据结构之类的如何存储, 使用 Struct 结构体存储
 
-    CATEGORY_KEY = 'categories'.freeze
+    CATEGORY_KEY = 'ali_categories'.freeze
 
-    PRODUCT_SKU_KEY = 'product_skus'.freeze
+    PRODUCT_SKU_KEY = 'ali_product_skus'.freeze
 
     def self.get_category_property_by_cache
-      
+
     end
-    
-    def self.get_category(id = 0)
+
+    def self.get_category(id = 0, access_token)
       getPostCategoryById id
     end
 
@@ -34,8 +34,8 @@ module Aliexpress
     #
     # @note 与获取单个类目信息内容相同
     #
-    def self.getChildrenPostCategoryById(id = 0)
-      api_endpoint 'api.getChildrenPostCategoryById', {cateId: id}
+    def self.getChildrenPostCategoryById(id = 0, access_token = '')
+      api_endpoint 'api.getChildrenPostCategoryById', {cateId: id, access_token: access_token}
     end
 
     # 获取单个类目信息
@@ -43,14 +43,14 @@ module Aliexpress
     #
     # @param [Fixnum] id  类目属性 ID
     #
-    def self.getPostCategoryById(id = 0)
-      api_endpoint 'api.getPostCategoryById', {cateId: id}
+    def self.getPostCategoryById(id = 0, access_token = '')
+      api_endpoint 'api.getPostCategoryById', {cateId: id, access_token: access_token}
     end
 
     # 获取叶子类目下的 普通类目属性
     # @note #doc#
-    def self.getAttributesResultByCateId(id = 3)
-      api_endpoint 'api.getAttributesResultByCateId', {cateId: id}
+    def self.getAttributesResultByCateId(id = 3, access_token = '')
+      api_endpoint 'api.getAttributesResultByCateId', {cateId: id, access_token: access_token}
     end
 
     # 通过关键词获取发布类目 - 搜索获取
@@ -112,20 +112,29 @@ module Aliexpress
   #
   # 导出所有的分类信息
   #
-  def self.export_all_category
+  def self.export_all_category(access_token = '')
     # 缓存分类
-    cache_category
+    cache_category access_token
 
     # 导出分类
     dump_category
   end
 
-  # 尝试递归失败, 递归学不好。 递归传文件做为参数，可能有些问题。
-  # 换个方式，利用 缓存（Cache） 处理。
-  def test_for_output_csv
+  #
+  # 导出所有 sku 属性信息
+  #
+  def self.export_all_product_sku(category_file = '', access_token = '')
+    cache_product_sku category_file, access_token
+
+    dump_product_sku
+  end
+
+  # 尝试递归失败, 递归学不好。 递归传文件做为参数，由于文件指针的存在的波动性，确实是有些问题。
+  # 换个方式，利用 缓存（Cache）处理
+  def test_for_output_csv(access_token = '')
     category_file = "tmp/aliexpress_category_#{Time.now.strftime('%Y%m%d%h%m')}.csv"
     headers = %w( id 等级 名称-中文 名称-英文 parent_id)
-    categories = Aliexpress::Category.getChildrenPostCategoryById(0)
+    categories = Aliexpress::Category.getChildrenPostCategoryById(0, access_token)
 
     csv = CSV.open category_file, 'wb'
 
@@ -150,13 +159,13 @@ module Aliexpress
   #
   # 通过接口，将获取的分类的数据保存到 redis 中
   #
-  def self.cache_category(id = 0)
-    tmp_category = Aliexpress::Category.getChildrenPostCategoryById(id)
+  def self.cache_category(access_token = '', id = 0)
+    tmp_category = Aliexpress::Category.getChildrenPostCategoryById(id, access_token)
     Aliexpress.redis.hset Category::CATEGORY_KEY, id, Marshal.dump(tmp_category)
 
     tmp_category.aeopPostCategoryList.each do |category|
       unless category.isleaf
-        cache_category(category.id)
+        cache_category(access_token, category.id)
       end
     end
   end
@@ -230,11 +239,12 @@ module Aliexpress
   #
   # 获取 商品三级分类 下的 sku 属性
   #
-  def self.cache_product_sku
+  def self.cache_product_sku(category_file = '', access_token = '')
     # 备注: 这里 文件，可以存放到 /tmp/aliexpress/category.csv, 打包到成 gem
-    # 应该不能在 tmp 目录下写入文件了, CSV.open(file, 'wb') { |csv|  csv << ['测试位无金额', '']  }
-    # 可以向还不存在的目录下，创建文件
-    category_file = 'tmp/aliexpress_category_20160321Mar03.csv'
+    # 应该不能在 tmp 目录下写入文件
+    unless category_file.present? && File.exist?(category_file)
+      category_file = 'tmp/aliexpress_category_20160620Jun06.csv'
+    end
 
     category_ids = []
 
@@ -245,7 +255,7 @@ module Aliexpress
     category_ids[1..-1].each do |id|
       next if Aliexpress.redis.hexists Category::PRODUCT_SKU_KEY, id
 
-      tmp_sku = Aliexpress::Category.getAttributesResultByCateId(id)
+      tmp_sku = Aliexpress::Category.getAttributesResultByCateId(id, access_token)
 
       Aliexpress.redis.hset Category::PRODUCT_SKU_KEY, id, Marshal.dump(tmp_sku)
     end
@@ -262,9 +272,9 @@ module Aliexpress
     CSV.open sku_file, 'wb' do |csv|
       csv << headers
 
-      Aliexpress.redis.hgetall(Category::PRODUCT_SKU_KEY).each do |k, v|
+      Aliexpress.redis.hgetall(Aliexpress::Category::PRODUCT_SKU_KEY).each do |k, v|
         tmp_skus = Marshal.load(v)
-        next if tmp_skus.attributes.blank?
+        next if tmp_skus.try(:attributes).blank?
 
         tmp_skus.attributes.each do |sku|
           puts "sku = #{sku}"
