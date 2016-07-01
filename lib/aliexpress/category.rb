@@ -23,8 +23,8 @@ module Aliexpress
 
     end
 
-    def self.get_category(id = 0, access_token)
-      getPostCategoryById id
+    def self.get_category(id = 0, access_token = '')
+      getPostCategoryById id, access_token
     end
 
     # 获取下级目录的类目信息
@@ -48,8 +48,9 @@ module Aliexpress
     end
 
     # 获取类目下的相关属性
-    # @note #doc#
+    # @note 与 getChildAttributesResultByPostCateIdAndPath 功能类似，但获取的数据以及速度不及后者
     #
+    # 不建议使用
     def self.getAttributesResultByCateId(id = 3, access_token = '')
       api_endpoint 'api.getAttributesResultByCateId', {cateId: id, access_token: access_token}
     end
