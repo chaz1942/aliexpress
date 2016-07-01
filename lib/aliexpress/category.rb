@@ -47,8 +47,9 @@ module Aliexpress
       api_endpoint 'api.getPostCategoryById', {cateId: id, access_token: access_token}
     end
 
-    # 获取叶子类目下的 普通类目属性
+    # 获取类目下的相关属性
     # @note #doc#
+    #
     def self.getAttributesResultByCateId(id = 3, access_token = '')
       api_endpoint 'api.getAttributesResultByCateId', {cateId: id, access_token: access_token}
     end
