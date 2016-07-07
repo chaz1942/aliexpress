@@ -76,7 +76,8 @@ module Aliexpress
       end
     rescue => e
       puts e
-      puts 'should redirect to Authorization.get_auth_url'
+
+      nil
     end
 
     #
@@ -135,9 +136,11 @@ module Aliexpress
     def self.refresh_access_token(access_token_key, refresh_token_key)
       refresh_token = get_refresh_token refresh_token_key
 
-      response = get_access_token refresh_token
+      if refresh_token.present?
+        response = get_access_token refresh_token
 
-      set_access_token(response, access_token_key)
+        set_access_token(response, access_token_key)
+      end
     end
 
     #

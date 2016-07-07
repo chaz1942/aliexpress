@@ -12,5 +12,7 @@ module Aliexpress
 
     # 支付减库存
     PAYMENT = 'payment_success_deduct'
+    
+    ALL = [ORDER, PAYMENT]
   end
 end

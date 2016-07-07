@@ -62,6 +62,7 @@ module Aliexpress
       end
 
       # 根据订单 ID 获取订单的交易
+      #
       def getOrderTradeInfoById(id = 0)
         findOrderTradeInfo orderId: id
       end
