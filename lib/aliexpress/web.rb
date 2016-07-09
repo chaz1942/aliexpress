@@ -7,8 +7,10 @@ module Aliexpress
     get '/' do
       puts "params = #{params}"
 
+      @project_url = Aliexpress.project_url
+
       if params[:code].blank? && params[:state].blank?
-        redirect '/sells/b2c_platforms'
+        redirect @project_url
         return
       end
 

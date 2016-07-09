@@ -28,15 +28,16 @@ Or install it yourself as:
 Aliexpress.app_key = 'Your app key'
 Aliexpress.app_secret = 'Your app secret' 
 
-Aliexpress.redis = Redis::Namespace.new(RedisSetting.name_space.to_sym, redis: Redis.new )
-Aliexpress.redirect_uri = AliexpressSetting.redirect_uri
+Aliexpress.redis = Redis::Namespace.new('namespace', redis: Redis.new )
+Aliexpress.redirect_uri = 'http://your-domain/aliexpress/auth' # gem 包提供的
+Aliexpress.project_url = '/'    # 
 ```
 
 在路由中，添加如下的行: 
 
 ```
 require 'aliexpress/web'
-mount Aliexpress::Web => '/aliexpress/auth'
+mount Aliexpress::Web => '/aliexpress/auth' 
 ```
 
 API 的使用，api 的命名 与 速卖通中的文档类似，文件和类的结构如下: 
@@ -87,13 +88,48 @@ Aliexpress::Product.findProductInfoListQuery params
 
 ## 授权流程
 
-参考: 速卖通官方授权的流程。
+参考: 速卖通官方授权的流程(<http://gw.api.alibaba.com/dev/doc/intl/sys_auth.htm?ns=aliexpress.open>)。 具体的步骤： 
+
+1. 获取授权的 URL 地址: Aliexpress::Authorization.get_auth_url(account.unique_id)， 并在 页面或直接在浏览器中打开
+
+  备注: 生成的 URL 链接: "http://authhz.alibaba.com/auth/authorize.htm?client_id=#{Aliexpress.app_key}&site=aliexpress&redirect_uri=http://xiajian.vip.natapp.cn/aliexpress/auth&state=account_9&_aop_signature=26E277DD75FA169BE830CCBFEC858C5FD5879F4D"
+
+
+2. 在速卖通的授权页面，输入用户名密码，点击授权，等待会跳到回调地址(Aliexpress.redirect_uri) - gem 包提供的处理逻辑
+
+3. 处理逻辑结束后，会跳到项目的地址(Aliexpress.project_url)，之后，获取`access_token`的大体逻辑如下: 
+
+```
+def account_access_token_key
+ set_token_key 'access_token', account_refresh_token_key
+end
+
+def account_refresh_token_key
+ set_token_key 'refresh_token', self.unique_id
+end
+
+def set_token_key(type = '', value)
+ token_key = "#{type}_key"
+ return self.content[token_key] if self.content[token_key].present?
+ 
+ self.content[token_key] = Aliexpress::Base.public_send "get_#{token_key}".to_sym, value
+
+ self.save
+
+ self.content[token_key]
+end
+
+# get_ali_account_token '309af7f538d786747aa644f8a2e4dc51', '2a96b17127a5cd29f2309df75a3524f6'
+def get_ali_access_token
+ Aliexpress::Base.access_token(account_refresh_token_key, account_access_token_key)
+end
+```
 
 
 
 ## 多用户 和 单用户的区别
 
-存储都是使用 redis，关键在于 key 。
+存储都是使用 redis，关键在于 key， 通过授权 state 参数，设置 key 的变化，从而存储多个 refresh_token 以及 access_token。
 
 单用户: 
 

@@ -94,11 +94,12 @@ module Aliexpress
     #
     # @param [Fixnum] per - 当前页数
     # @param [Fixnum] page - 页面的列表数
-    def self.list_image(per = 1, page = 6, type = LocationType::ALL_GROUP)
+    def self.list_image(access_token = '', per = 1, page = 6, type = LocationType::ALL_GROUP)
       params = {
           currentPage: per,
           pageSize: page,
-          locationType: type
+          locationType: type,
+          access_token: access_token
       }
 
       response = self.listImagePagination(params)

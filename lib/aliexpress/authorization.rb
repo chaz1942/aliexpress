@@ -5,6 +5,7 @@ module Aliexpress
     #
     # 获取速卖通的授权登陆的地址
     # 地址: http://gw.api.alibaba.com/dev/doc/intl/sys_auth.htm?ns=aliexpress.open
+    # @param {string} params - 传递给 state 的参数，可在回调中地址中原路返回
     #
     # @return String 返回发起授权的请求
     def self.get_auth_url(params = '')

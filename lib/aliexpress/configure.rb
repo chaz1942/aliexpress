@@ -31,7 +31,7 @@ module Aliexpress
 
     # 项目主地址 - 授权回调之后跳转的地址
     mattr_accessor :project_url
-    self.project_url = '/'
+    self.project_url = '/sells/b2c_platforms'
 
     # redis 配置
     mattr_accessor :redis

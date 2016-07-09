@@ -5,8 +5,8 @@ module Aliexpress
     # 列出用户的运费模板
     # 地址： http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.listFreightTemplate&v=1
     #
-    def self.listFreightTemplate
-      api_endpoint 'api.listFreightTemplate'
+    def self.listFreightTemplate(access_token = '')
+      api_endpoint 'api.listFreightTemplate', { access_token: access_token}
     end
 
     # 通过模板ID获取运费模板的详细信息

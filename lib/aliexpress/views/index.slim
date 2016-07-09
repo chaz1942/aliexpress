@@ -3,7 +3,7 @@ html
   head
     title 速卖通授权页面
     script src='//cdn.bootcss.com/jquery/2.2.0/jquery.min.js'
-  body
+  body data-project-url=@project_url
     h3 正在授权，请稍后。。。。  　
 
     /h3 等待下次 refresh token 过期，再用这个页面。获取并刷新 token
@@ -26,7 +26,7 @@ javascript:
       //var time = parseInt($('.timer').html().trim());
       if(time == 0) {
         clearInterval(timer);
-        window.location.href = '/sells/b2c_platforms';
+        window.location.href = "#{@project_url}";
       } else {
         $('.timer').html(--time);
       }
