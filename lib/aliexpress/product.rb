@@ -163,13 +163,45 @@ module Aliexpress
       end
 
       # 获取单个商品的信息
-      def get_product(id = '32356501891')
-        findAeProductById productId: id
+      def get_product(id = '', access_token = '')
+        findAeProductById productId: id, access_token: access_token
       end
 
-      def get_promise_template(id = -1)
-        queryPromiseTemplateById id
+      def get_promise_template(id = -1, access_token = '')
+        queryPromiseTemplateById id, access_token
       end
+
+      def online_product(ids, access_token)
+        if ids.is_a?(Array)
+          product_ids = ids.join(';')
+        elsif ids.is_a?(String)
+          product_ids = ids
+        end
+
+        options = {
+            productIds: product_ids,
+            access_token: access_token
+        }
+
+        onlineAeProduct options
+      end
+
+      def offline_product(ids, access_token)
+        if ids.is_a?(Array)
+          product_ids = ids.join(';')
+        elsif ids.is_a?(String)
+          product_ids = ids
+        end
+
+        options = {
+            productIds: product_ids,
+            access_token: access_token
+        }
+
+        offlineAeProduct options
+      end
+
+
 
       # 卖家可以通过这个接口发布一个多语言商品。一次只能发布一种多语言商品
       # 地址: http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=alibaba.product.postMultilanguageAeProduct&v=1
@@ -395,6 +427,7 @@ module Aliexpress
 
       # 发布产品信息
       # 地址：http://gw.api.alibaba.com/dev/doc/intl/api.htm?ns=aliexpress.open&n=api.postAeProduct&v=1
+      # @note: 有机会实现代码中的相关的验证
       #
       # @param [Hash] 应用参数
       def postAeProduct(params = {}, body = {})
