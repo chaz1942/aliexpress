@@ -10,7 +10,7 @@ module Aliexpress
 
       cost_time = Time.now - start_time
 
-      puts "Cost Time is: #{cost_time} s"
+      logger.info "Cost Time is: #{cost_time} s"
 
       result
     end

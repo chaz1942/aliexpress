@@ -38,7 +38,7 @@ module Aliexpress
     #
     # @note 实际上，速卖通可能不支持 png 等格式的图片
     def self.upload_image_from_url(url, access_token)
-      puts 'Note: 不支持 png 格式的图片'
+      logger.info 'Note: 不支持 png 格式的图片'
       upload_temp_image download(url), access_token
     end
 

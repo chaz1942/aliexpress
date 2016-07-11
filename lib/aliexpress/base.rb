@@ -65,7 +65,7 @@ module Aliexpress
     #
     # @return 返回 refresh_token
     def self.get_refresh_token(redis_key = get_refresh_token_key)
-      puts "refresh_token_key: #{redis_key}"
+      logger.info "refresh_token_key: #{redis_key}"
 
       token = redis.get redis_key
 
@@ -75,7 +75,7 @@ module Aliexpress
         raise ValidRefreshTokenException, 'Refresh token cannot be empty !'
       end
     rescue => e
-      puts e
+      logger.info e
 
       nil
     end
@@ -95,7 +95,7 @@ module Aliexpress
 
       token_url = "#{token_url}/#{app_key}?#{options.map { |k, v| "#{k}=#{v}" }.join('&')}"
 
-      puts token_url
+      logger.info token_url
 
       JSON.parse RestClient.post(token_url, {})
     end
@@ -161,7 +161,7 @@ module Aliexpress
       # RestClient 发送 post 请求，报 RestClient::BadRequest: 400 Bad Request
       response = JSON.parse RestClient.post(token_url, {})
 
-      puts response
+      logger.info response
 
       set_access_token response
 
@@ -212,31 +212,31 @@ module Aliexpress
 
       signature_factor << params.map { |k, v| "#{k}#{v}" }.sort.join
 
-      # puts "signature_factor = #{signature_factor}"
+      # logger.info "signature_factor = #{signature_factor}"
 
       signature = get_signature signature_factor
 
-      # puts "signature = #{signature}"
+      # logger.info "signature = #{signature}"
 
       params.merge! _aop_signature: signature
 
       # tmp_url = "#{api_url}/#{url_path}?#{Helpers.to_url_param params}"
       tmp_url = "#{api_url}/#{url_path}"
 
-      puts "Request URL：#{tmp_url}"
+      logger.info "Request URL：#{tmp_url}"
 
-      puts "Request Body: #{options[:body].merge!(params)}"
+      logger.info "Request Body: #{options[:body].merge!(params)}"
 
       response = Profile.prof { RestClient.post tmp_url, options[:body], options[:headers] }
 
-      puts "Response Result: #{response}"
+      logger.info "Response Result: #{response}"
 
       # TODO: 根据获取的返回值，抛出异常，刷新 Refresh Token - 过期的时间是半年
       ::Hashie::Mash.new JSON.parse(response)
     rescue => e
       if e.is_a? RestClient::ExceptionWithResponse
-        puts "Response Code: #{e.message}"
-        puts "Response Boby: #{e.http_body}"
+        logger.info "Response Code: #{e.message}"
+        logger.info "Response Boby: #{e.http_body}"
       else
         logger.info e
       end

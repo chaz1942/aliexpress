@@ -184,7 +184,7 @@ module Aliexpress
       Aliexpress.redis.hgetall(Category::CATEGORY_KEY).each do |k, v|
 
         Marshal.load(v).aeopPostCategoryList.each do |category|
-          puts category
+          logger.info category
           csv << [category['id'], category['level'], category['names']['zh'], category['names']['en'], k, category['isleaf']]
         end
       end
@@ -222,8 +222,8 @@ module Aliexpress
         next if tmp_skus.attributes.blank?
 
         tmp_skus.attributes.each do |sku|
-          puts "sku = #{sku}"
-          puts "insert array = #{ [k, sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required] }"
+          logger.info "sku = #{sku}"
+          logger.info "insert array = #{ [k, sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required] }"
           # Note: 注意不能使用 sku.values
           if sku[:values].present?
             sku[:values].each do |item|
@@ -279,8 +279,8 @@ module Aliexpress
         next if tmp_skus.try(:attributes).blank?
 
         tmp_skus.attributes.each do |sku|
-          puts "sku = #{sku}"
-          puts "insert array = #{ [k, sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required] }"
+          logger.info "sku = #{sku}"
+          logger.info "insert array = #{ [k, sku.id, sku.names.zh, sku.names.en, '', '', '', sku.required] }"
           # Note: 注意不能使用 sku.values
           if sku[:values].present?
             sku[:values].each do |item|

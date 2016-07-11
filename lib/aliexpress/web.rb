@@ -5,7 +5,7 @@ module Aliexpress
 
     # 授权页面
     get '/' do
-      puts "params = #{params}"
+      Aliexpress.logger.info "params = #{params}"
 
       @project_url = Aliexpress.project_url
 

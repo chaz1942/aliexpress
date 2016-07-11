@@ -34,7 +34,7 @@ module Aliexpress
 
       response = RestClient.get(current_time_url)
 
-      puts "response = #{response}"
+      logger.info "response = #{response}"
 
       Time.parse response.body
     end

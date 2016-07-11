@@ -19,7 +19,7 @@ module Aliexpress
     # @param [string] key - 存储在 redis 中的健
     # @param [Time] time - key 的过期，默认为空
     def self.fetch(key, time = nil)
-      puts "###### cache-key #######  #{key} #######"
+      logger.info "###### cache-key #######  #{key} #######"
 
       value = redis.get key
 

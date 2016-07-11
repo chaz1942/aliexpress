@@ -18,7 +18,7 @@ module Aliexpress
 
       signature = get_signature options.map { |k,v|  "#{k}#{v}" }.sort.join
 
-      puts "signature =  #{signature}"
+      logger.info "signature =  #{signature}"
 
       "#{auth_url}?#{options.map { |k, v| "#{k}=#{v}" }.join('&')}&_aop_signature=#{signature}"
     end
@@ -50,12 +50,12 @@ module Aliexpress
 
       tmp_url =  "#{token_url}/#{app_key}?#{options.map { |k, v| "#{k}=#{v}" }.join('&')}"
 
-      puts "token_url = #{tmp_url}"
+      logger.info "token_url = #{tmp_url}"
 
       # RestClient 发送 post 请求，报 RestClient::BadRequest: 400 Bad Request
       response = JSON.parse RestClient.post(tmp_url, {})
 
-      puts "response = #{response}"
+      logger.info "response = #{response}"
 
       refresh_token_key = get_refresh_token_key params[:state]
 
@@ -66,8 +66,8 @@ module Aliexpress
       set_access_token response, access_token_key
     rescue => e
       if e.is_a? RestClient::ExceptionWithResponse
-        puts "Response Code: #{e.message}"
-        puts "Response Boby: #{e.http_body}"
+        logger.info "Response Code: #{e.message}"
+        logger.info "Response Boby: #{e.http_body}"
       else
         logger.info e
       end
