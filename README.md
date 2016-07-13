@@ -29,8 +29,9 @@ Aliexpress.app_key = 'Your app key'
 Aliexpress.app_secret = 'Your app secret' 
 
 Aliexpress.redis = Redis::Namespace.new('namespace', redis: Redis.new )
+Aliexpress.logger = Rails.logger   # 默认使用的是 Logger 的实例变量
 Aliexpress.redirect_uri = 'http://your-domain/aliexpress/auth' # gem 包提供的
-Aliexpress.project_url = '/'    # 
+Aliexpress.project_url = '/'    
 ```
 
 在路由中，添加如下的行: 
